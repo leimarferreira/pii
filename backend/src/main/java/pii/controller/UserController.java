@@ -27,7 +27,7 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	@GetMapping("/")
+	@GetMapping
 	public ResponseEntity<Iterable<UserDTO>> getAll() {
 		var result = userService.findAll();
 		var status = HttpStatus.OK;
@@ -39,7 +39,7 @@ public class UserController {
 		return ResponseEntity.status(status).body(result);
 	}
 	
-	@GetMapping("/{id}")
+	@GetMapping("/id/{id}")
 	public ResponseEntity<Optional<UserDTO>> getById(@PathVariable Long id) {
 		var result = userService.findById(id);
 		var status = HttpStatus.OK;
@@ -51,8 +51,8 @@ public class UserController {
 		return ResponseEntity.status(status).body(result);
 	}
 	
-	@GetMapping("/{email}")
-	public ResponseEntity<Optional<UserDTO>> getByEmail(@PathVariable @Size(max = 100) String email) {
+	@GetMapping("/email/{email}")
+	public ResponseEntity<Optional<UserDTO>> getByEmail(@PathVariable @Size(max = 255) String email) {
 		var result = userService.findByEmail(email);
 		var status = HttpStatus.OK;
 		
@@ -63,7 +63,7 @@ public class UserController {
 		return ResponseEntity.status(status).body(result);
 	}
 	
-	@PostMapping("/")
+	@PostMapping
 	public ResponseEntity<Optional<UserDTO>> post(@Valid @RequestBody UserDTO user) {
 		var result = userService.save(user);
 		var status = HttpStatus.OK;

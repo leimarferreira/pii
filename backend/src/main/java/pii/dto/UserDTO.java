@@ -18,10 +18,11 @@ public record UserDTO (
 		String name,
 		@NotBlank
 		@NotEmpty
-		@NotBlank
+		@NotNull
 		@Size(max = 100)
 		@JsonInclude(Include.NON_NULL)
 		String email,
+		@Size(max = 2048)
 		@JsonInclude(Include.NON_NULL)
 		String avatar
 ) {}

@@ -2,10 +2,9 @@ package pii.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
-
-// TODO: terminar essa classe
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,14 +48,19 @@ public class UserDAO implements UserRepository {
 			findUser.setLong(1, id);
 			var result = findUser.executeQuery();
 			
-			var user = new User(
-					result.getLong("id"),
-					result.getString("name"),
-					result.getString("email"),
-					result.getString("avatar"));
+			if (result.next()) {
+				var user = new User(
+						result.getLong("id"),
+						result.getString("name"),
+						result.getString("email"),
+						result.getString("avatar"));
+				
+				return user;
+			}
 			
-			return user;
+			return null;
 		} catch (SQLException e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -80,34 +84,20 @@ public class UserDAO implements UserRepository {
 		}
 	}
 	
-	private User findLatestInsertedUser() {
-		var query = "SELECT * FROM user WHERE id = LAST_INSERT_ID()";
-		
-		try (var findLatestUser = connection.prepareStatement(query)) {
-			var result = findLatestUser.executeQuery();
-			var user = new User(
-					result.getLong("id"),
-					result.getString("name"),
-					result.getString("email"),
-					result.getString("avatar"));
-			
-			return user;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
 	public User save(User user) {
-		var statement = "INSERT INTO user VALUES (?, ?, ?)";
+		var statement = "INSERT INTO user (name, email, avatar) VALUES (?, ?, ?)";
 		
-		try (var saveUser = connection.prepareStatement(statement)) {
+		try (var saveUser = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
 			saveUser.setString(1, user.name());
 			saveUser.setString(2, user.email());
 			saveUser.setString(3, user.avatar());
 			
-			saveUser.execute();
-			return findLatestInsertedUser();
+			saveUser.executeUpdate();
+			
+			var result = saveUser.getGeneratedKeys();
+			result.next();
+			var id = result.getLong("GENERATED_KEY");
+			return findById(id);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
