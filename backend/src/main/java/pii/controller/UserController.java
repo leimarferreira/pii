@@ -64,9 +64,9 @@ public class UserController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Optional<UserDTO>> post(@Valid @RequestBody UserDTO user) {
+	public ResponseEntity<Optional<UserDTO>> postUser(@Valid @RequestBody UserDTO user) {
 		var result = userService.save(user);
-		var status = HttpStatus.OK;
+		var status = HttpStatus.CREATED;
 		
 		if (result.isEmpty()) {
 			status = HttpStatus.BAD_REQUEST;
@@ -76,19 +76,24 @@ public class UserController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<Optional<UserDTO>> update(@PathVariable Long id, @Valid @RequestBody UserDTO user) {
-		var result = userService.update(id, user);
+	public ResponseEntity<Optional<UserDTO>> putUser(@PathVariable Long id, @Valid @RequestBody UserDTO user) {
+		var existingUser = userService.findById(id);
+		
+		var result = Optional.<UserDTO>empty();
 		var status = HttpStatus.OK;
 		
-		if (result.isEmpty()) {
-			status = HttpStatus.NOT_FOUND;
+		if (existingUser.isPresent()) {
+			result = userService.update(id, user);
+		} else {
+			result = userService.save(user);
+			status = HttpStatus.CREATED;
 		}
 		
 		return ResponseEntity.status(status).body(result);
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Optional<Void>> delete(@PathVariable Long id) {
+	public ResponseEntity<Optional<Void>> deleteUser(@PathVariable Long id) {
 		var result = userService.delete(id);
 		var status = HttpStatus.OK;
 		
