@@ -52,7 +52,7 @@ public class DataLoader {
 					number BIGINT NOT NULL UNIQUE,
 					type INT NOT NULL,
 					brand VARCHAR(50) NOT NULL,
-					limit DECIMAL(65, 30) NOT NULL,
+					`limit` DECIMAL(65, 30) NOT NULL,
 					current_value DECIMAL(65, 30),
 					due_date INT NOT NULL,
 					PRIMARY KEY (ID)
@@ -60,7 +60,7 @@ public class DataLoader {
 				""";
 		try (var statement = connection.prepareStatement(sql)) {
 			statement.execute();
-			logger.info("Criada tabela de cartões no banco de dados.");
+			logger.info("Criada tabela 'card' no banco de dados.");
 		} catch (SQLException exception) {
 			logger.error("Erro ao criar tabela de cartões.", exception);
 		}

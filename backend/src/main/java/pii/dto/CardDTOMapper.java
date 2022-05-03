@@ -1,7 +1,10 @@
 package pii.dto;
 
+import org.springframework.stereotype.Component;
+
 import pii.model.Card;
 
+@Component
 public class CardDTOMapper {
 	
 	public CardDTO toDTO(Card card) {
