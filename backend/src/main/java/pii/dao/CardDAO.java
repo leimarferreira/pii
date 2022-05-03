@@ -3,6 +3,7 @@ package pii.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -84,7 +85,7 @@ public class CardDAO {
 	}
 	
 	public Optional<Card> findById(Long cardId) {
-		var query = "SELECT FIRST FROM card WHERE id = ?";
+		var query = "SELECT * FROM card WHERE id = ?";
 		
 		try (var findCard = connection.prepareStatement(query)) {
 			findCard.setLong(1, cardId);
@@ -113,7 +114,7 @@ public class CardDAO {
 	}
 	
 	public Optional<Card> findByCardNumber(Long number) {
-		var query = "SELECT FIRST FROM card WHERE number = ?";
+		var query = "SELECT * FROM card WHERE number = ?";
 		
 		try (var findCard = connection.prepareStatement(query)) {
 			findCard.setLong(1, number);
@@ -143,10 +144,10 @@ public class CardDAO {
 	
 	public Optional<Long> save(Card card) {
 		var statement = """
-				INSERT INTO card (user_id, number, type, brand, limit, current_value, due_date)
+				INSERT INTO card (user_id, number, type, brand, `limit`, current_value, due_date)
 					VALUES(?, ?, ?, ?, ?, ?, ?)""";
 		
-		try (var insertCard = connection.prepareStatement(statement)) {
+		try (var insertCard = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
 			insertCard.setLong(1, card.userId());
 			insertCard.setLong(2, card.number());
 			insertCard.setInt(3, card.type().getValue());
@@ -154,6 +155,12 @@ public class CardDAO {
 			insertCard.setBigDecimal(5, card.limit());
 			insertCard.setBigDecimal(6, card.currentValue());
 			insertCard.setInt(7, card.dueDate());
+			
+			insertCard.executeUpdate();
+			
+			var result = insertCard.getGeneratedKeys();
+			result.next();
+			return Optional.ofNullable(result.getLong("GENERATED_KEY"));
 		} catch (SQLException exception) {
 			if (exception instanceof SQLIntegrityConstraintViolationException) {
 				throw new ConflictException("Número já utilizado por outro cartão no sistema.");
@@ -162,8 +169,6 @@ public class CardDAO {
 				throw new UncheckedSQLException("Erro ao salvar cartão.", exception);
 			}
 		}
-		
-		return Optional.empty();
 	}
 	
 	public void update(Long id, Card card) {
@@ -173,7 +178,7 @@ public class CardDAO {
 					number = ?,
 					type = ?,
 					brand = ?,
-					limit = ?,
+					`limit` = ?,
 					current_value = ?,
 					due_date = ?
 				WHERE id = ?""";
