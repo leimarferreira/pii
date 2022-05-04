@@ -49,13 +49,14 @@ public class DataLoader {
 				CREATE TABLE IF NOT EXISTS card (
 					id BIGINT NOT NULL AUTO_INCREMENT,
 					user_id BIGINT NOT NULL,
-					number BIGINT NOT NULL UNIQUE,
+					number VARCHAR(20) NOT NULL UNIQUE,
 					type INT NOT NULL,
 					brand VARCHAR(50) NOT NULL,
 					`limit` DECIMAL(65, 30) NOT NULL,
 					current_value DECIMAL(65, 30),
 					due_date INT NOT NULL,
-					PRIMARY KEY (ID)
+					PRIMARY KEY (ID),
+					FOREIGN KEY (user_id) REFERENCES user(id)
 				)
 				""";
 		try (var statement = connection.prepareStatement(sql)) {

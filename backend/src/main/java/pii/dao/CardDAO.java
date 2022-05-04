@@ -37,7 +37,7 @@ public class CardDAO {
 				var card = new Card(
 						result.getLong("id"),
 						result.getLong("user_id"),
-						result.getLong("number"),
+						result.getString("number"),
 						result.getInt("type"),
 						result.getString("brand"),
 						result.getBigDecimal("limit"),
@@ -67,7 +67,7 @@ public class CardDAO {
 				var card = new Card(
 						result.getLong("id"),
 						result.getLong("user_id"),
-						result.getLong("number"),
+						result.getString("number"),
 						result.getInt("type"),
 						result.getString("brand"),
 						result.getBigDecimal("limit"),
@@ -96,7 +96,7 @@ public class CardDAO {
 				var card = new Card(
 						result.getLong("id"),
 						result.getLong("user_id"),
-						result.getLong("number"),
+						result.getString("number"),
 						result.getInt("type"),
 						result.getString("brand"),
 						result.getBigDecimal("limit"),
@@ -125,7 +125,7 @@ public class CardDAO {
 				var card = new Card(
 						result.getLong("id"),
 						result.getLong("user_id"),
-						result.getLong("number"),
+						result.getString("number"),
 						result.getInt("type"),
 						result.getString("brand"),
 						result.getBigDecimal("limit"),
@@ -149,7 +149,7 @@ public class CardDAO {
 		
 		try (var insertCard = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
 			insertCard.setLong(1, card.userId());
-			insertCard.setLong(2, card.number());
+			insertCard.setString(2, card.number());
 			insertCard.setInt(3, card.type().getValue());
 			insertCard.setString(4, card.brand());
 			insertCard.setBigDecimal(5, card.limit());
@@ -163,7 +163,13 @@ public class CardDAO {
 			return Optional.ofNullable(result.getLong("GENERATED_KEY"));
 		} catch (SQLException exception) {
 			if (exception instanceof SQLIntegrityConstraintViolationException) {
-				throw new ConflictException("Número já utilizado por outro cartão no sistema.");
+				var errorCode = exception.getErrorCode();
+				var message = switch (errorCode) {
+					case 1452 -> String.format("Usuário com id '%d' não existe.", card.userId());
+					case 1062 -> "Número já utilizado por outro cartão no sistema.";
+					default -> "Erro ao salvar cartão.";
+				};
+				throw new ConflictException(message);
 			} else {
 				logger.error("Erro ao inserir cartão no banco de dados.", exception);
 				throw new UncheckedSQLException("Erro ao salvar cartão.", exception);
@@ -185,7 +191,7 @@ public class CardDAO {
 		
 		try (var updateCard = connection.prepareStatement(statement)) {
 			updateCard.setLong(1, card.userId());
-			updateCard.setLong(2, card.number());
+			updateCard.setString(2, card.number());
 			updateCard.setInt(3, card.type().getValue());
 			updateCard.setString(4, card.brand());
 			updateCard.setBigDecimal(5, card.limit());
@@ -196,7 +202,13 @@ public class CardDAO {
 			updateCard.executeUpdate();
 		} catch (SQLException exception) {
 			if (exception instanceof SQLIntegrityConstraintViolationException) {
-				throw new ConflictException("Número já utilizado por outro cartão no sistema.");
+				var errorCode = exception.getErrorCode();
+				var message = switch (errorCode) {
+					case 1452 -> String.format("Usuário com id '%d' não existe.", card.userId());
+					case 1062 -> "Número já utilizado por outro cartão no sistema.";
+					default -> "Erro ao atualizar informações do cartão.";
+				};
+				throw new ConflictException(message);
 			} else {
 				logger.error("Erro ao atualizar cartão no banco de dados.", exception);
 				throw new UncheckedSQLException("Erro ao atualizar informações do cartão.", exception);
