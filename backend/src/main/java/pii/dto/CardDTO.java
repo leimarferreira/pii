@@ -11,7 +11,7 @@ public record CardDTO(
 		Long id,
 		@JsonProperty("user_id")
 		Long userId,
-		Long number,
+		String number,
 		Integer type,
 		String brand,
 		BigDecimal limit,
