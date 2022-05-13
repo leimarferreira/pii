@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,11 +44,16 @@ public class AuthService {
 			var encodedPassword = passwordEncoder.encode(authDto.password());
 			var userCredentials = new UserCredentials(user.id(), user.email(), encodedPassword, UserRole.USER);
 			
-			var saveUserCredentialsResult = userCredentialService.save(userCredentials);
-			
-			if (saveUserCredentialsResult.isEmpty()) {
+			try {
+				var saveUserCredentialsResult = userCredentialService.save(userCredentials);
+				
+				if (saveUserCredentialsResult.isEmpty()) {
+					userService.delete(user.id());
+					return Optional.empty();
+				}
+			} catch (Exception exception) {
 				userService.delete(user.id());
-				return Optional.empty();
+				throw exception;
 			}
 			
 			return Optional.of(new JwtTokenDTO(jwtUtil.generateToken(user.email())));
@@ -59,7 +63,6 @@ public class AuthService {
 	}
 	
 	public Optional<JwtTokenDTO> login(AuthDTO dto) {
-		// TODO: tratar possível excessão lançada por esse método
 		var authInputToken = new UsernamePasswordAuthenticationToken(dto.email(), dto.password());
 		authenticationManager.authenticate(authInputToken);
 		

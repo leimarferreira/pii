@@ -40,7 +40,7 @@ public class UserCredentialsDAO {
 				var userCredentials = new UserCredentials(
 						result.getLong("id"),
 						result.getLong("user_id"),
-						result.getString(result.getString("email")),
+						result.getString("email"),
 						result.getString("password"),
 						result.getString("salt"),
 						result.getInt("user_role"));
@@ -72,7 +72,7 @@ public class UserCredentialsDAO {
 				var userCredentials = new UserCredentials(
 						result.getLong("id"),
 						result.getLong("user_id"),
-						result.getString(result.getString("email")),
+						result.getString("email"),
 						result.getString("password"),
 						result.getString("salt"),
 						result.getInt("user_role"));
@@ -103,7 +103,7 @@ public class UserCredentialsDAO {
 				var userCredentials = new UserCredentials(
 						result.getLong("id"),
 						result.getLong("user_id"),
-						result.getString(result.getString("email")),
+						result.getString("email"),
 						result.getString("password"),
 						result.getString("salt"),
 						result.getInt("user_role"));
@@ -151,8 +151,8 @@ public class UserCredentialsDAO {
 				
 				throw new ConflictException(message);
 			} else {
-				logger.error("Falha ao inserir as credenciais do usuário no banco de dados.");
-				throw new UncheckedSQLException("Erro ao salvar as credenciais do usuário.");
+				logger.error("Falha ao inserir as credenciais do usuário no banco de dados.", exception);
+				throw new UncheckedSQLException("Erro ao salvar as credenciais do usuário.", exception);
 			}
 		}
 	}

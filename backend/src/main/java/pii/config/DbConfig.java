@@ -37,7 +37,6 @@ public class DbConfig {
 			var connection = DriverManager.getConnection(url, user, password);
 			return connection;
 		} catch (SQLException e) {
-			System.err.println(e);
 			logger.error("Erro ao estabelecer conexão com o banco de dados.");
 			return null;
 		}

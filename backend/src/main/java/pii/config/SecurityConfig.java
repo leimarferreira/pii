@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import pii.enums.UserRole;
+import pii.service.UserCredentialsService;
 import pii.util.security.JWTFilter;
 
 @Configuration
@@ -24,6 +25,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private JWTFilter jwtFilter;
 	
+	@Autowired
+	private UserCredentialsService userCredentialsService;
+	
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
@@ -32,8 +36,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 			.authorizeHttpRequests()
 			.antMatchers("/auth/**").permitAll()
-			.antMatchers("/**").hasRole(UserRole.USER.name())
+			.antMatchers("/user/**").hasRole(UserRole.USER.name())
 			.and()
+			.userDetailsService(userCredentialsService)
 			.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Sem autorização.");
 			}).and()
@@ -50,7 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Bean
 	@Override
-	public AuthenticationManager authenticationManager() throws Exception {
+	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
 }
