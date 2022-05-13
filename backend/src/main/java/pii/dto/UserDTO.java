@@ -27,4 +27,8 @@ public record UserDTO (
 		@Size(max = 2048, message = "Tamanho máximo de 2048 caracteres.")
 		@JsonInclude(Include.NON_NULL)
 		String avatar
-) {}
+) {
+	public UserDTO(String name, String email) {
+		this(null, name, email, null);
+	}
+}

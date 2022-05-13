@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -38,6 +40,20 @@ public class ControllerExceptionHandler {
 	@ResponseStatus(HttpStatus.CONFLICT)
 	public ResponseEntity<ErrorResponseDTO> handleConflictException(ConflictException exception) {
 		var response = new ErrorResponseDTO(HttpStatus.CONFLICT, exception.getMessage());
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+	
+	@ExceptionHandler(AuthenticationException.class)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	public ResponseEntity<ErrorResponseDTO> handleAuthenticationException(AuthenticationException exception) {
+		var response = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED, exception.getMessage());
+		return ResponseEntity.status(response.getStatus()).body(response);
+	}
+	
+	@ExceptionHandler(UsernameNotFoundException.class)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	public ResponseEntity<ErrorResponseDTO> handleUsernameNotFoundException(UsernameNotFoundException exception) {
+		var response = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED, exception.getMessage());
 		return ResponseEntity.status(response.getStatus()).body(response);
 	}
 

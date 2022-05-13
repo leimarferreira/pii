@@ -23,6 +23,7 @@ public class DataLoader {
 		logger.info("Inicializando banco de dados.");
 		createUserTable();
 		createCardTable();
+		createAuthTable();
 	}
 	
 	private void createUserTable() {
@@ -56,7 +57,7 @@ public class DataLoader {
 					current_value DECIMAL(65, 30),
 					due_date INT NOT NULL,
 					PRIMARY KEY (ID),
-					FOREIGN KEY (user_id) REFERENCES user(id)
+					FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 				)
 				""";
 		try (var statement = connection.prepareStatement(sql)) {
@@ -64,6 +65,25 @@ public class DataLoader {
 			logger.info("Criada tabela 'card' no banco de dados.");
 		} catch (SQLException exception) {
 			logger.error("Erro ao criar tabela de cartões.", exception);
+		}
+	}
+	
+	private void createAuthTable() {
+		var sql = """
+				CREATE TABLE IF NOT EXISTS user_credentials (
+					id BIGINT NOT NULL AUTO_INCREMENT,
+					user_id BIGINT NOT NULL UNIQUE,
+					password VARCHAR(60) NOT NULL,
+					user_role INT NOT NULL,
+					PRIMARY KEY (id),
+					FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+				)
+				""";
+		try (var statement = connection.prepareStatement(sql)) {
+			statement.execute();
+			logger.info("Criada a tabela 'user_credentials' no banco de dados.");
+		} catch (SQLException exception) {
+			logger.error("Erro ao criar tabela 'user_credentials' no banco de dados.");
 		}
 	}
 }
