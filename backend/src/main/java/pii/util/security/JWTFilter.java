@@ -14,12 +14,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
 import pii.service.UserCredentialsService;
 
+
+// TODO: tratar todas as excessões lançadas por essa classe
+@Component
 public class JWTFilter extends OncePerRequestFilter {
 	
 	@Autowired
@@ -37,7 +41,7 @@ public class JWTFilter extends OncePerRequestFilter {
 			var jwt = authHeader.substring(7);
 			
 			if (jwt == null || jwt.isBlank()) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT Token.");
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Token inválido.");
 			} else {
 				try {
 					var email = jwtUtil.validateTokenAndRetrieveSubject(jwt);
@@ -48,14 +52,15 @@ public class JWTFilter extends OncePerRequestFilter {
 						SecurityContextHolder.getContext().setAuthentication(authToken);
 					}
 				} catch (JWTVerificationException exception) {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT Token.");
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Token inválido.");
 				}
 			}
 		}
+		
+		filterChain.doFilter(request, response);
 	}
 	
 	private Collection<? extends GrantedAuthority> getAuthorities(String role) {
-		return Arrays.asList(new SimpleGrantedAuthority(role));
+		return Arrays.asList(new SimpleGrantedAuthority("ROLE_" + role));
 	}
-
 }
