@@ -25,7 +25,7 @@ public class UserCredentialsDAO {
 	
 	public Optional<UserCredentials> findById(Long id) {
 		var query = """
-				SELECT uc.id, uc.user_id, user.email, uc.password, uc.salt, uc.user_role
+				SELECT uc.id, uc.user_id, user.email, uc.password, uc.user_role
 				FROM user_credentials uc
 				INNER JOIN user ON user.id = uc.user_id
 				WHERE uc.id = ?
@@ -42,7 +42,6 @@ public class UserCredentialsDAO {
 						result.getLong("user_id"),
 						result.getString("email"),
 						result.getString("password"),
-						result.getString("salt"),
 						result.getInt("user_role"));
 				
 				return Optional.of(userCredentials);
@@ -57,7 +56,7 @@ public class UserCredentialsDAO {
 	
 	public Optional<UserCredentials> findByUserId(Long userId) {
 		var query = """
-				SELECT uc.id, uc.user_id, user.email, uc.password, uc.salt, uc.user_role
+				SELECT uc.id, uc.user_id, user.email, uc.password, uc.user_role
 				FROM user_credentials uc
 				INNER JOIN user ON user.id = uc.user_id
 				WHERE uc.user_id = ?
@@ -74,7 +73,6 @@ public class UserCredentialsDAO {
 						result.getLong("user_id"),
 						result.getString("email"),
 						result.getString("password"),
-						result.getString("salt"),
 						result.getInt("user_role"));
 				
 				return Optional.of(userCredentials);
@@ -89,7 +87,7 @@ public class UserCredentialsDAO {
 	
 	public Optional<UserCredentials> findByUserEmail(String email) {
 		var query = """
-				SELECT uc.id, uc.user_id, user.email, uc.password, uc.salt, uc.user_role
+				SELECT uc.id, uc.user_id, user.email, uc.password, uc.user_role
 				FROM user_credentials uc INNER JOIN user ON user.id = uc.user_id 
 				WHERE user.email = ?
 				""";
@@ -105,7 +103,6 @@ public class UserCredentialsDAO {
 						result.getLong("user_id"),
 						result.getString("email"),
 						result.getString("password"),
-						result.getString("salt"),
 						result.getInt("user_role"));
 				
 				return Optional.of(userCredentials);
@@ -120,15 +117,14 @@ public class UserCredentialsDAO {
 	
 	public Optional<Long> save(UserCredentials userCredentials) {
 		var statement = """
-				INSERT INTO user_credentials(user_id, password, salt, user_role)
-				VALUES (?, ?, ?, ?)
+				INSERT INTO user_credentials(user_id, password, user_role)
+				VALUES (?, ?, ?)
 				""";
 		
 		try (var insertUserCredentials = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
 			insertUserCredentials.setLong(1, userCredentials.userId());
 			insertUserCredentials.setString(2, userCredentials.password());
-			insertUserCredentials.setString(3, userCredentials.salt());
-			insertUserCredentials.setInt(4, userCredentials.role().getValue());
+			insertUserCredentials.setInt(3, userCredentials.role().getValue());
 			
 			insertUserCredentials.executeUpdate();
 			
@@ -161,16 +157,14 @@ public class UserCredentialsDAO {
 		var statement = """
 				UPDATE user_credentials SET
 					password = ?,
-					salt = ?,
 					user_role = ?
 				WHERE id = ?
 				""";
 		
 		try (var updateUserCredentials = connection.prepareStatement(statement)) {
 			updateUserCredentials.setString(1, userCredentials.password());
-			updateUserCredentials.setString(2, userCredentials.salt());
-			updateUserCredentials.setInt(3, userCredentials.role().getValue());
-			updateUserCredentials.setLong(4, id);
+			updateUserCredentials.setInt(2, userCredentials.role().getValue());
+			updateUserCredentials.setLong(3, id);
 			
 			updateUserCredentials.executeUpdate();
 		} catch (SQLException exception) {

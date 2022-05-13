@@ -74,7 +74,6 @@ public class DataLoader {
 					id BIGINT NOT NULL AUTO_INCREMENT,
 					user_id BIGINT NOT NULL UNIQUE,
 					password VARCHAR(60) NOT NULL,
-					salt VARCHAR(64),
 					user_role INT NOT NULL,
 					PRIMARY KEY (id),
 					FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
