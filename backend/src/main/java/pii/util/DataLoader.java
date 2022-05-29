@@ -24,6 +24,7 @@ public class DataLoader {
 		createUserTable();
 		createCardTable();
 		createAuthTable();
+		createCategoryTable();
 	}
 	
 	private void createUserTable() {
@@ -84,6 +85,23 @@ public class DataLoader {
 			logger.info("Criada a tabela 'user_credentials' no banco de dados.");
 		} catch (SQLException exception) {
 			logger.error("Erro ao criar tabela 'user_credentials' no banco de dados.");
+		}
+	}
+	
+	private void createCategoryTable() {
+		var sql = """
+				CREATE TABLE IF NOT EXISTS category (
+					id BIGINT NOT NULL AUTO_INCREMENT,
+					name VARCHAR(50),
+					PRIMARY KEY (id)
+				)
+				""";
+		
+		try (var statement = connection.prepareStatement(sql)) {
+			statement.execute();
+			logger.info("Criada a tabela 'category' no banco de dados.");
+		} catch (SQLException exception) {
+			logger.error("Erro ao criar tabela 'category' no banco de dados.");
 		}
 	}
 }
