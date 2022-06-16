@@ -1,5 +1,7 @@
+import { Navigate } from "react-router-dom";
+
 const Home = () => {
-  return <></>;
+  return <Navigate to="/register" />;
 };
 
 export default Home;
