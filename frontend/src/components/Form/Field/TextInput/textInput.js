@@ -2,7 +2,15 @@
 import { useRef } from "react";
 import "./textInput.css";
 
-const TextInput = ({ name, placeholder, type, icon, value, onChange }) => {
+const TextInput = ({
+  name,
+  placeholder,
+  type,
+  icon,
+  value,
+  onChange,
+  className,
+}) => {
   const inputRef = useRef(null);
 
   const onFieldClick = () => {
@@ -15,7 +23,10 @@ const TextInput = ({ name, placeholder, type, icon, value, onChange }) => {
   };
 
   return (
-    <div className="form-field form-field-text-input" onClick={onFieldClick}>
+    <div
+      className={`${className} form-field form-field-text-input`}
+      onClick={onFieldClick}
+    >
       {icon && <span className="form-field-left-icon">{icon}</span>}
       <input
         type={type}

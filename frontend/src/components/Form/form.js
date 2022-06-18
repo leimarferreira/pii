@@ -20,7 +20,7 @@ const Form = ({ onSubmit, children, title }) => {
           <hr className="title-bottom-line" />
         </div>
       )}
-      <form onSubmit={submitForm} className="form">
+      <form onSubmit={onSubmit ? submitForm : onsubmit} className="form">
         {children}
       </form>
     </>
