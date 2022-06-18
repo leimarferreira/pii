@@ -64,6 +64,7 @@ const Register = () => {
 
   return (
     <div className="content">
+      <div className="register-background"></div>
       <div className="register-form">
         <Form title={"Criar conta"} onSubmit={submitData}>
           <TextInput
