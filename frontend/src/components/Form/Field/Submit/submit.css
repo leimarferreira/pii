@@ -1,0 +1,14 @@
+.form-field-submit {
+  background-color: #4998f5;
+  color: #fff;
+
+  font-family: inherit;
+  font-size: 12pt;
+  font-weight: 700;
+  text-transform: uppercase;
+
+  height: 40px;
+  border-radius: 70px;
+
+  margin-bottom: 0px;
+}

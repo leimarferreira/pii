@@ -1,0 +1,44 @@
+.login-screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  background-image: linear-gradient(transparent 76.225%, #7c8cc7 23.775%);
+}
+
+.login-screen > .background-image {
+  min-height: 100vh;
+  flex-grow: 1;
+  background-image: url("assets/background_login_page.png");
+  background-size: auto 95%;
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  overflow: visible;
+}
+
+.login-form {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 22vw;
+  margin-right: 7vw;
+  margin-bottom: 60px;
+}
+
+.login-submit {
+  margin-top: 55px;
+}
+
+.register-screen-link {
+  display: flex;
+  justify-content: center;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.register-screen-link a {
+  color: rgba(0, 0, 0, 0.54);
+  text-decoration: none;
+}
