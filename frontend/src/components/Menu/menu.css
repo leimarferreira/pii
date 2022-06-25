@@ -1,0 +1,20 @@
+.menu {
+    background-color: white;
+    width: fit-content;
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+}
+
+.horizontal {
+    justify-content: center;
+    align-items: center;
+}
+
+.vertical {
+    max-width: 120px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
