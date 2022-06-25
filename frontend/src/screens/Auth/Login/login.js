@@ -3,12 +3,14 @@ import useTitle from "utils/hooks/useTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 import "./login.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import authService from "services/authService";
 
 const Login = () => {
   useTitle("Entre na sua conta");
+
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,8 +25,17 @@ const Login = () => {
 
     try {
       await authService.login(data);
+      navigate("/");
     } catch (error) {
-      setErrorMessage(error.message);
+      if (error?.response?.status === 401) {
+        setErrorMessage("Email ou senha inválidos.");
+      } else if (error?.response?.status === 500) {
+        setErrorMessage(
+          "Serviço indisponível. Tente novamente em alguns instantes."
+        );
+      } else {
+        setErrorMessage(error?.response?.data?.message ?? "Ocorreu um erro.");
+      }
       setError(true);
     }
   };
