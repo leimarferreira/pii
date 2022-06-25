@@ -1,0 +1,23 @@
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  margin: 0 10px;
+}
+
+.menu-item:hover {
+  cursor: pointer;
+}
+
+.menu-item-icon {
+  font-size: 30px;
+}
+
+.menu-item-title {
+  word-wrap: normal;
+  font-size: 12pt;
+  font-weight: bold;
+  text-align: center;
+}

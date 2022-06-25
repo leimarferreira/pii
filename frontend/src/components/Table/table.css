@@ -1,0 +1,26 @@
+.table {
+  background-color: #fff;
+  padding: 2px 20px 10px;
+  border: none;
+  border-radius: 20px;
+}
+
+table {
+  margin-top: 0;
+  width: 100%;
+  table-layout: fixed;
+}
+
+table,
+table > tr,
+table > tr > th,
+table > tr > td {
+  border: 2px solid blue;
+  border-collapse: collapse;
+}
+
+table caption {
+  text-align: left;
+  font-size: 14pt;
+  font-weight: bold;
+}

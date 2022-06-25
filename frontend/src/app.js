@@ -1,11 +1,16 @@
-import { BrowserRouter } from "react-router-dom";
-import AppRoutes from "./routes";
+import Header from "components/Header/header";
+import { Navigate, Outlet } from "react-router-dom";
 
 const App = () => {
-  return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+  const userAuthenticated = true;
+
+  return userAuthenticated ? (
+    <>
+      <Header />
+      <Outlet />
+    </>
+  ) : (
+    <Navigate to="/login" />
   );
 };
 
