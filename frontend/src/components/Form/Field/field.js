@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import Checkbox from "./Checkbox/checkbox";
 import "./field.css";
 import Submit from "./Submit/submit";

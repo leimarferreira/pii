@@ -103,8 +103,6 @@ const Register = () => {
             <Checkbox
               name="terms-of-use"
               label="Eu aceito os termos de uso"
-              // TODO: refatorar a forma de capturar o valor durante a mudança
-              // para que o evento possa também ser capturado se for necessário
               onChange={setUserTermsAccepted}
             />
             <Submit
