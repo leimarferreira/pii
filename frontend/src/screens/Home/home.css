@@ -1,0 +1,19 @@
+.home-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+}
+
+.home-menu {
+    margin: 20px 0;
+}
+
+.icon-expense > * {
+    transform: rotateX(180deg);
+}
+
+.home-table {
+    width: 80%;
+    margin-bottom: 20px;
+}
