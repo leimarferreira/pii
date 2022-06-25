@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import "./menuItem.css";
 
 const MenuItem = ({ title, icon, onClick, className }) => {

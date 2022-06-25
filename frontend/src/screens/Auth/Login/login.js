@@ -31,7 +31,6 @@ const Login = () => {
 
   return (
     <div className="login-screen">
-      {/* TODO: remover essa div em volta do form */}
       <div className="background-image"></div>
       <div className="login-form">
         <Form title="Login" onSubmit={submitData}>

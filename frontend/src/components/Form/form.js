@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-// TODO: remover todos os eslint-disable-
 import Field from "./Field/field";
 import Checkbox from "./Field/Checkbox/checkbox";
 import Submit from "./Field/Submit/submit";

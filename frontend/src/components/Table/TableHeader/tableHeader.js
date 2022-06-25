@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import "./tableHeader.css";
 
 const TableHeader = ({ children }) => {

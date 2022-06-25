@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import "./table.css";
 
 const Table = ({ title, children, className }) => {
