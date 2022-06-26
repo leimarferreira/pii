@@ -1,9 +1,8 @@
-import Header from "components/Header/header";
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import authService from "services/authService";
 
-const App = () => {
+const Auth = () => {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -18,17 +17,8 @@ const App = () => {
   return loading ? (
     <></>
   ) : (
-    <>
-      {userLoggedIn ? (
-        <>
-          <Header />
-          <Outlet />
-        </>
-      ) : (
-        <Navigate to="/auth/login" />
-      )}
-    </>
+    <>{userLoggedIn ? <Navigate to="/" /> : <Outlet />}</>
   );
 };
 
-export default App;
+export default Auth;

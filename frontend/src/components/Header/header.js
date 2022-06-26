@@ -6,9 +6,19 @@ import {
   faCircleUser,
 } from "@fortawesome/free-solid-svg-icons";
 import "./header.css";
+import { useEffect, useState } from "react";
+import request from "services/request";
 
 const Header = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    request
+      .get("/user/current")
+      .then((response) => setUser(response.data))
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="header">
@@ -25,10 +35,17 @@ const Header = () => {
         />
       </div>
       <div className="user-link" onClick={() => navigate("/user")}>
-        <span className="user-icon">
-          <FontAwesomeIcon icon={faCircleUser} />
-        </span>
-        <p className="user-name">Nome de usuário</p>
+        {user.avatar ? (
+          <div className="user-avatar">
+            <img src={user.avatar} />
+          </div>
+        ) : (
+          <span className="user-icon">
+            <FontAwesomeIcon icon={faCircleUser} />
+          </span>
+        )}
+
+        <p className="user-name">{user?.name ?? "Nome de usuário"}</p>
       </div>
     </div>
   );

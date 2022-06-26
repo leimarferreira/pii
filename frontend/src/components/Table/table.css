@@ -12,9 +12,11 @@ table {
 }
 
 table,
-table > tr,
-table > tr > th,
-table > tr > td {
+thead,
+tbody,
+tr,
+th,
+td {
   border: 2px solid blue;
   border-collapse: collapse;
 }
@@ -23,4 +25,8 @@ table caption {
   text-align: left;
   font-size: 14pt;
   font-weight: bold;
+}
+
+tr.selected {
+  background-color: #ccc;
 }

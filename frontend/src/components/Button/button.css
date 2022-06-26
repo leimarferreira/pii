@@ -1,0 +1,14 @@
+.button {
+  color: #fff;
+
+  border: none;
+
+  font-family: inherit;
+  font-size: 12pt;
+  font-weight: 700;
+
+  height: 40px;
+  border-radius: 70px;
+
+  margin-bottom: 0px;
+}

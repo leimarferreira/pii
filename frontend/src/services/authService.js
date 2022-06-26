@@ -7,7 +7,7 @@ const register = async ({ name, email, password }) => {
     password,
   };
 
-  const response = await request.post("/auth/register", data);
+  const response = await request.post("/auth/public/register", data);
 
   if (response.status === 200) {
     const token = response.data.token;
@@ -21,7 +21,7 @@ const login = async ({ email, password }) => {
     password,
   };
 
-  const response = await request.post("/auth/login", data);
+  const response = await request.post("/auth/public/login", data);
 
   if (response.status === 200) {
     const token = response.data.token;
@@ -41,14 +41,18 @@ const isLoggedIn = async () => {
   const token = localStorage.getItem("token");
 
   if (token) {
-    const response = await request.get("/auth/validatetoken");
+    try {
+      const response = await request.get("/auth/validate");
 
-    if (response.status === 200) {
-      return response.data;
+      if (response.status === 200) {
+        return response.data;
+      }
+
+      return false;
+    } catch {
+      return false;
     }
   }
-
-  return false;
 };
 
 export default {

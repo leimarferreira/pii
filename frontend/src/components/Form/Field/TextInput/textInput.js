@@ -9,6 +9,7 @@ const TextInput = ({
   value,
   onChange,
   className,
+  label,
 }) => {
   const inputRef = useRef(null);
 
@@ -22,19 +23,26 @@ const TextInput = ({
   };
 
   return (
-    <div
-      className={`${className} form-field form-field-text-input`}
-      onClick={onFieldClick}
-    >
-      {icon && <span className="form-field-left-icon">{icon}</span>}
-      <input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange ? handleValueChange : () => {}}
-        ref={inputRef}
-      />
+    <div className="form-field-text-input-container">
+      {label && (
+        <label className="form-field-text-input-label" htmlFor={name}>
+          {label}
+        </label>
+      )}
+      <div
+        className={`${className} form-field form-field-text-input`}
+        onClick={onFieldClick}
+      >
+        {icon && <span className="form-field-left-icon">{icon}</span>}
+        <input
+          type={type}
+          name={name}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange ? handleValueChange : () => {}}
+          ref={inputRef}
+        />
+      </div>
     </div>
   );
 };

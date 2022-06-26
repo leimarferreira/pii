@@ -1,14 +1,4 @@
-.form-field-text-input-container {
-  width: 100%;
-}
-
-.form-field-text-input-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.form-field-text-input {
+.form-field-select {
   box-sizing: border-box;
   background-color: #fff;
   height: 40px;
@@ -19,7 +9,18 @@
   padding: 0 15px;
 }
 
-.form-field-text-input input {
+.form-field-select-container {
+  width: 100%;
+}
+
+.form-field-select-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.form-field-select select {
+  background-color: #fff;
   width: 100%;
   height: 100%;
   margin: 0;
@@ -28,11 +29,6 @@
   border-radius: inherit;
   border: inherit;
   outline: none;
-}
-
-.form-field-text-input input::placeholder {
-  font-size: 12pt;
-  color: rgba(0, 0, 0, 0.5);
 }
 
 .form-field-left-icon {

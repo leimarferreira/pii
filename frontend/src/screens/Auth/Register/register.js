@@ -8,12 +8,13 @@ import {
   faFloppyDisk,
 } from "@fortawesome/free-solid-svg-icons";
 import "./register.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useTitle from "utils/hooks/useTitle";
 import authService from "services/authService";
 
 const Register = () => {
   useTitle("Cadastre-se");
+  const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -54,10 +55,16 @@ const Register = () => {
     };
 
     try {
-      authService.register(data);
+      await authService.register(data);
+      navigate("/");
     } catch (error) {
-      // TODO: tratar esse erro corretamente
-      setErrorMessage(error.message);
+      if (error?.response?.status === 500) {
+        setErrorMessage(
+          "Serviço indisponível. Tente novamente em alguns instantes."
+        );
+      } else {
+        setErrorMessage(error?.response?.data?.message ?? "Ocorreu um erro.");
+      }
       setError(true);
     }
   };

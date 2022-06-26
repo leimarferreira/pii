@@ -1,5 +1,6 @@
 import Checkbox from "./Checkbox/checkbox";
 import "./field.css";
+import Select from "./Select/select";
 import Submit from "./Submit/submit";
 import TextInput from "./TextInput/textInput";
 
@@ -12,6 +13,7 @@ const Field = ({
   onChange,
   disabled,
   label,
+  children,
 }) => {
   switch (type) {
     case "text":
@@ -36,6 +38,12 @@ const Field = ({
       return <Checkbox label={label} name={name} onChange={onChange} />;
     case "submit":
       return <Submit value={value} />;
+    case "select":
+      return (
+        <Select label={label} onChange={onChange} value={value} icon={icon}>
+          {children}
+        </Select>
+      );
   }
 };
 
