@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import "./menu.css";
 
 const Menu = ({ direction, children, className }) => {
@@ -6,10 +5,6 @@ const Menu = ({ direction, children, className }) => {
     direction !== "horizontal" && direction !== "vertical"
       ? "horizontal"
       : direction;
-
-  useEffect(() => {
-    console.log(directionClass);
-  }, []);
 
   return (
     <div className={`menu ${directionClass} ${className ?? ""}`.trim()}>

@@ -1,0 +1,23 @@
+.filter-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2px;
+}
+
+.filter-option .form-field,
+.filter-option .form-field input,
+.filter-option .form-field select {
+  background-color: #ccc;
+  margin: 0;
+}
+
+.filter-option > .form-field {
+  width: 70%;
+}
+
+.filter-option-label {
+  width: 30%;
+  font-weight: bold;
+  text-align: center;
+}
