@@ -1,0 +1,25 @@
+.income-form-screen {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+  overflow-y: scroll;
+}
+
+.income-menu {
+  position: sticky;
+  margin-left: 1%;
+  height: 50vh;
+}
+
+.income-form-container {
+  border-radius: 2%;
+  width: 70%;
+  padding: 2%;
+  background-color: #eee;
+  margin: 200px 10% 2% 2%;
+}
+
+.error-message {
+  color: #f00;
+}
