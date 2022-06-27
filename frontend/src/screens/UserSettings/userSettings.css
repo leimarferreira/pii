@@ -1,0 +1,28 @@
+.user-form-screen {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow-y: scroll;
+}
+
+.user-menu {
+  position: sticky;
+  margin: 80px 0 auto 1%;
+  height: 60vh;
+}
+
+.user-form-container {
+  border-radius: 2%;
+  width: 70%;
+  padding: 2%;
+  background-color: #eee;
+  margin: 30px 10% 2% 2%;
+}
+
+.error-message {
+  color: #f00;
+}
+
+.logout-option, .logout-icon {
+  color: #f00;
+}

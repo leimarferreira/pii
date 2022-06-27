@@ -37,7 +37,7 @@ const Header = () => {
       <div className="user-link" onClick={() => navigate("/user")}>
         {user.avatar ? (
           <div className="user-avatar">
-            <img src={`data:image/png;base64,${user.avatar}`} />
+            <img src={user.avatar} />
           </div>
         ) : (
           <span className="user-icon">

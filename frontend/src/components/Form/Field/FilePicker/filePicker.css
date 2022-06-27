@@ -1,0 +1,35 @@
+.form-field-filepicker {
+    box-sizing: border-box;
+    background-color: #fff;
+    height: 40px;
+    border-radius: 70px;
+    margin-bottom: 20px;
+    border: none;
+    width: 100%;
+    padding: 5px 20px;
+  }
+  
+  .form-field-filepicker-container {
+    width: 100%;
+  }
+  
+  .form-field-filepicker-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .form-field-filepicker input {
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 12pt;
+    border: inherit;
+    outline: none;
+  }
+  
+  .form-field-left-icon {
+    margin: 0 15px 0 0;
+  }

@@ -227,7 +227,7 @@ const ExpenseForm = () => {
           navigate("/expense");
         }
       } catch {
-        setErrorMessage("Erro ao salvar cartão.");
+        setErrorMessage("Erro ao salvar despesa.");
         setError(true);
       }
     }

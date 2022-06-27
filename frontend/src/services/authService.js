@@ -29,6 +29,19 @@ const login = async ({ email, password }) => {
   }
 };
 
+const updatePassword = async ({ password, id }) => {
+  const data = {
+    password,
+  };
+
+  const response = await request.put(`/auth/credentials/password/${id}`, data);
+
+  if (response.status === 200) {
+    const token = response.data.token;
+    localStorage.setItem("token", token);
+  }
+};
+
 const logout = () => {
   const token = localStorage.getItem("token");
 
@@ -55,9 +68,30 @@ const isLoggedIn = async () => {
   }
 };
 
+const validateCredentials = async ({ email, password }) => {
+  const data = {
+    email,
+    password,
+  };
+
+  try {
+    const response = await request.post("/auth/public/login", data);
+
+    if (response.status === 200) {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+
+  return false;
+};
+
 export default {
   register,
   login,
+  updatePassword,
   logout,
   isLoggedIn,
+  validateCredentials,
 };
