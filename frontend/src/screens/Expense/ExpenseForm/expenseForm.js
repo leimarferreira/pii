@@ -55,7 +55,7 @@ const ExpenseForm = () => {
       setPaymentMethod(expense.paymentMethod);
       setNumberOfParcels(expense.numberOfParcels);
       setIsPaid(expense.isPaid);
-      setDueDate(new Date(expense.date).toLocaleDateString());
+      setDueDate(new Date(expense.dueDate).toLocaleDateString());
       setDueDateValue(expense.date);
 
       getCategory();
@@ -115,8 +115,10 @@ const ExpenseForm = () => {
     let cardsAux = [];
     if (paymentMethod === 1) {
       cardsAux = creditCards;
+      setCardId(creditCards[0]?.id ?? 0);
     } else if (paymentMethod === 2) {
       cardsAux = debitCards;
+      setCardId(debitCards[0]?.id ?? 0);
     } else if (paymentMethod === 3) {
       setCardId(0);
     }
@@ -319,7 +321,7 @@ const ExpenseForm = () => {
             label="Data de vencimento"
             name="date"
             type="text"
-            placeholder="mm/dd/aaaa"
+            placeholder="dd/mm/aaaa"
             onChange={setDueDate}
             value={dueDate}
           />

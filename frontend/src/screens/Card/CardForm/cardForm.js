@@ -66,7 +66,7 @@ const CardForm = () => {
     if (/\/card\/edit\/.*/g.test(pathname)) {
       setEdit(true);
     }
-  }, [pathname]);
+  }, []);
 
   useEffect(() => {
     getUser();
@@ -96,18 +96,14 @@ const CardForm = () => {
     return parseInt(value);
   };
 
-  const sanitizeFloat = (value) => {
-    return parseFloat(value);
-  };
-
   const submitData = async () => {
     const data = {
       userId: user.id,
       number: cardNumber,
       type: cardType,
       brand: cardBrand,
-      currentValue: currentValue,
-      limit: limit,
+      currentValue: parseFloat(currentValue),
+      limit: parseFloat(limit),
       dueDate: dueDate,
     };
 
@@ -183,37 +179,42 @@ const CardForm = () => {
             onChange={setCardBrand}
             value={cardBrand}
           />
-          <TextInput
-            label="Valor atual"
-            name="current-value"
-            type="text"
-            placeholder="0.00"
-            onChange={(value) => setCurrentValue(sanitizeFloat(value))}
-            value={currentValue}
-          />
-          <TextInput
-            label="Limite"
-            name="limit"
-            type="text"
-            placeholder="0.00"
-            onChange={(value) => setLimit(sanitizeFloat(value))}
-            value={limit}
-          />
-          <Select
-            label="Dia do fechamento"
-            onChange={(value) => setDueDate(sanitizeInt(value))}
-            value={dueDate}
-          >
-            {Array(30)
-              .fill(0)
-              .map((_, index) => {
-                return (
-                  <option key={index} value={index + 1}>
-                    {index + 1}
-                  </option>
-                );
-              })}
-          </Select>
+          {cardType === 1 && (
+            <>
+              <TextInput
+                label="Valor atual"
+                name="current-value"
+                type="text"
+                placeholder="0.00"
+                onChange={setCurrentValue}
+                value={currentValue}
+              />
+              <TextInput
+                label="Limite"
+                name="limit"
+                type="text"
+                placeholder="0.00"
+                onChange={setLimit}
+                value={limit}
+              />
+
+              <Select
+                label="Dia do fechamento"
+                onChange={(value) => setDueDate(sanitizeInt(value))}
+                value={dueDate}
+              >
+                {Array(30)
+                  .fill(0)
+                  .map((_, index) => {
+                    return (
+                      <option key={index} value={index + 1}>
+                        {index + 1}
+                      </option>
+                    );
+                  })}
+              </Select>
+            </>
+          )}
           <Submit value="Salvar" />
           {hasError && <span className="error-message">{errorMessage}</span>}
         </Form>

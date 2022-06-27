@@ -220,7 +220,7 @@ const IncomeForm = () => {
             label="Data"
             name="date"
             type="text"
-            placeholder="mm/dd/aaaa"
+            placeholder="dd/mm/aaaa"
             onChange={setDate}
             value={date}
           />

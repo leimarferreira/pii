@@ -220,12 +220,14 @@ const Income = () => {
               <Button
                 title="Atualizar"
                 className="update-button"
-                onClick={() => navigate(`/income/edit/${selected.id}`)}
+                onClick={() =>
+                  selected.id && navigate(`/income/edit/${selected.id}`)
+                }
               />
               <Button
                 title="Adicionar receita"
                 className="add-button"
-                onClick={() => selected.id && navigate("/income/add")}
+                onClick={() => navigate("/income/add")}
               />
               <Button
                 title="Deletar"

@@ -22,6 +22,7 @@ const Card = () => {
 
   const [user, setUser] = useState(null);
   const [cards, setCards] = useState([]);
+  const [userFinancialData, setUserFinancialData] = useState({});
   const [filteredCards, setFilteredCards] = useState([]);
   const [tableRows, setTableRows] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -72,9 +73,11 @@ const Card = () => {
           <td>{card.number}</td>
           <td>{cardTypes[card.type]}</td>
           <td>{card.brand}</td>
-          <td>{card.type === 1 ? card.limit : ""}</td>
-          <td>{card.type === 2 ? card.currentValue : ""}</td>
-          <td>{card.dueDate}</td>
+          <td>
+            {card.type === 1 ? card.limit : userFinancialData.totalIncomes}
+          </td>
+          <td>{card.type === 1 ? card.currentValue : "-"}</td>
+          <td>{card.type === 1 ? card.dueDate : "-"}</td>
         </tr>
       );
     });
@@ -95,6 +98,15 @@ const Card = () => {
   useEffect(() => {
     getUser();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      request
+        .get(`/user/data/${user.id}`)
+        .then((response) => setUserFinancialData(response.data))
+        .catch(() => {});
+    }
+  }, [user]);
 
   const filter = () => {
     let cardsAux = cards;
@@ -211,12 +223,14 @@ const Card = () => {
               <Button
                 title="Atualizar"
                 className="update-button"
-                onClick={() => navigate(`/card/edit/${selected.id}`)}
+                onClick={() =>
+                  selected.id && navigate(`/card/edit/${selected.id}`)
+                }
               />
               <Button
                 title="Criar novo cartão"
                 className="add-button"
-                onClick={() => selected.id && navigate("/card/add")}
+                onClick={() => navigate("/card/add")}
               />
               <Button
                 title="Deletar"
