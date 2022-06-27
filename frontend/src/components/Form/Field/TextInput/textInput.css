@@ -38,3 +38,24 @@
 .form-field-left-icon {
   margin: 0 15px 0 0;
 }
+
+.form-field-right-icon {
+  margin: 0 0 0 15px;
+  color: #f00;
+}
+
+.error-message-popover {
+  display: none;
+  width: fit-content;
+  max-width: 400px;
+  position: absolute;
+  transform: translateX(27vw);
+}
+
+.error-message-popover:hover {
+  display: flex;
+}
+
+.form-field-right-icon:hover ~ .error-message-popover {
+  display: flex;
+}

@@ -1,4 +1,8 @@
-import { useRef } from "react";
+import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { validate } from "components/Form/helpers/validator";
+import Popover from "components/Popover/popover";
+import { useRef, useState } from "react";
 import "./textInput.css";
 
 const TextInput = ({
@@ -11,7 +15,11 @@ const TextInput = ({
   className,
   label,
   min,
+  validation,
+  onError,
 }) => {
+  const [hasError, setError] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
   const inputRef = useRef(null);
 
   const onFieldClick = () => {
@@ -21,6 +29,18 @@ const TextInput = ({
   const handleValueChange = (event) => {
     const value = event.target.value;
     onChange(value);
+    validateInput(value);
+  };
+
+  const validateInput = (input) => {
+    if (validation) {
+      const result = validate(input, validation);
+      setError(result.hasError);
+      setErrorMessages(result.errorMessages);
+      if (result.hasError && onError) {
+        onError();
+      }
+    }
   };
 
   return (
@@ -44,6 +64,20 @@ const TextInput = ({
           onChange={onChange ? handleValueChange : () => {}}
           ref={inputRef}
         />
+        {hasError && (
+          <span className="form-field-right-icon error-icon">
+            <FontAwesomeIcon icon={faCircleExclamation} />
+          </span>
+        )}
+        <Popover className="error-message-popover">
+          {errorMessages.map((message) => {
+            return (
+              <span key={message} className="error-message">
+                {message}
+              </span>
+            );
+          })}
+        </Popover>
       </div>
     </div>
   );

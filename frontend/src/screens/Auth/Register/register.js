@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Form, { Checkbox, Field, Submit, TextInput } from "components/Form/form";
+import Form, { Checkbox, Submit, TextInput } from "components/Form/form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser,
@@ -81,6 +81,9 @@ const Register = () => {
             icon={<FontAwesomeIcon icon={faUser} />}
             value={name}
             onChange={setName}
+            validation={{
+              required: { value: true, message: "Digite seu nome completo." },
+            }}
           />
           <TextInput
             type="text"
@@ -89,6 +92,12 @@ const Register = () => {
             icon={<FontAwesomeIcon icon={faEnvelope} />}
             value={email}
             onChange={setEmail}
+            validation={{
+              required: {
+                value: true,
+                message: "É necessário digitar um email.",
+              },
+            }}
           />
           <TextInput
             type="password"
@@ -97,14 +106,62 @@ const Register = () => {
             icon={<FontAwesomeIcon icon={faKey} />}
             value={password}
             onChange={setPassword}
+            validation={{
+              required: {
+                value: true,
+                message: "É necessário digitar uma senha.",
+              },
+              patterns: [
+                {
+                  pattern: "[A-Z]",
+                  message: "A senha deve ter pelo menos uma letra maiúscula.",
+                },
+                {
+                  pattern: "[a-z]",
+                  message: "A senha deve ter pelo menos uma letra minúscula.",
+                },
+                {
+                  pattern: "\\d",
+                  message: "A senha deve ter pelo menos um dígito.",
+                },
+                {
+                  pattern: "\\W|_",
+                  message: "A senha deve ter pelo menos um caractere especial.",
+                },
+                {
+                  pattern: "^.{8,}$",
+                  message: "A senha deve ter no mínimo 8 caracteres.",
+                },
+              ],
+            }}
           />
-          <Field
+          <TextInput
             type="password"
             name="confirm-password"
             placeholder="Confirme a senha"
             icon={<FontAwesomeIcon icon={faFloppyDisk} />}
             value={confirmPassword}
             onChange={setConfirmPassword}
+            validation={{
+              required: {
+                value: true,
+                message: "Este campo é obrigatório.",
+              },
+              rules: [
+                {
+                  rule: (input) => {
+                    if (input === password) {
+                      setPasswordConfirmed(true);
+                      return true;
+                    } else {
+                      setPasswordConfirmed(false);
+                      return false;
+                    }
+                  },
+                  message: "As senhas não coincidem.",
+                },
+              ],
+            }}
           />
           <div className="register-form-footer">
             <Checkbox
