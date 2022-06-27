@@ -66,6 +66,21 @@
   margin: 0;
 }
 
+.user-link > .user-avatar {
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  margin: 0;
+  padding: 0;
+}
+
+.user-avatar img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  margin: 0;
+  padding: 0;
+}
+
 .user-link > .user-name {
   color: #fff;
   margin: 0;

@@ -51,7 +51,7 @@ public class CategoryController {
 		return ResponseEntity.status(status).body(result);
 	}
 
-	@GetMapping("/name")
+	@GetMapping("/name/{name}")
 	public ResponseEntity<Optional<CategoryDTO>> getByName(@PathVariable(name = "name") String name) {
 		var result = categoryService.findByName(name);
 		var status = HttpStatus.OK;

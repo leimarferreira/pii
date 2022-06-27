@@ -10,11 +10,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import pii.dto.AuthDTO;
+import pii.service.AuthService;
+import pii.service.UserService;
+
 @Component
 public class DataLoader {
 	
 	@Autowired
 	private Connection connection;
+	
+	@Autowired
+	private AuthService authService;
+	
+	@Autowired
+	private UserService userService;
 	
 	private final Logger logger = LoggerFactory.getLogger(DataLoader.class);
 	
@@ -26,6 +36,8 @@ public class DataLoader {
 		createAuthTable();
 		createCategoryTable();
 		createIncomeTable();
+		createExpenseTable();
+		createDefaultAdminAccount();
 	}
 	
 	private void createUserTable() {
@@ -34,7 +46,7 @@ public class DataLoader {
 					id BIGINT NOT NULL AUTO_INCREMENT,
 					name VARCHAR(255) NOT NULL,
 					email VARCHAR(255) UNIQUE NOT NULL,
-					avatar VARCHAR(2048),
+					avatar MEDIUMTEXT,
 					PRIMARY KEY (id)
 				)
 				""";
@@ -108,7 +120,7 @@ public class DataLoader {
 	
 	private void createIncomeTable() {
 		var sql = """
-				CREATE TABLE IF NOT EXISTS income (
+				CREATE TABLE IF NOT EXISTS incomes (
 					id BIGINT NOT NULL AUTO_INCREMENT,
 					user_id BIGINT NOT NULL,
 					value DECIMAL (65, 30) NOT NULL,
@@ -126,6 +138,42 @@ public class DataLoader {
 			logger.info("Criada a tabela 'incomes' no banco de dados.");
 		} catch (SQLException exception) {
 			logger.error("Erro ao criar tabela 'incomes' no banco de dados.");
+		}
+	}
+	
+	private void createExpenseTable() {
+		var sql = """
+				CREATE TABLE IF NOT EXISTS expenses (
+					id BIGINT NOT NULL AUTO_INCREMENT,
+					user_id BIGINT NOT NULL,
+					value DECIMAL (65, 30) NOT NULL,
+					description VARCHAR(200),
+					category_id BIGINT NOT NULL,
+					payment_method INTEGER NOT NULL,
+					number_of_parcels INTEGER,
+					is_paid BOOLEAN NOT NULL,
+					card_id BIGINT,
+					due_date BIGINT,
+					PRIMARY KEY (id),
+					FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+					FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE
+				)
+				""";
+		
+		try (var statement = connection.prepareStatement(sql)) {
+			statement.execute();
+			logger.info("Criada a tabela 'expenses' no banco de dados.");
+		} catch (SQLException exception) {
+			logger.error("Erro ao criar tabela 'incomes' no banco de dados.");
+		}
+	}
+	
+	private void createDefaultAdminAccount() {
+		var existingAdmin = userService.findByEmail("admin@admin.org");
+
+		if (existingAdmin.isEmpty()) {
+			var authDto = new AuthDTO("ADMIN", "admin@admin.org", "admin1234", "ADMIN");
+			authService.registerAdmin(authDto);
 		}
 	}
 }

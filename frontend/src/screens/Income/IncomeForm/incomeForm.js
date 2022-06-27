@@ -164,7 +164,7 @@ const IncomeForm = () => {
           navigate("/income");
         }
       } catch {
-        setErrorMessage("Erro ao salvar cartão.");
+        setErrorMessage("Erro ao salvar receita.");
         setError(true);
       }
     }

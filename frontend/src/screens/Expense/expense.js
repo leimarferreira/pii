@@ -15,23 +15,29 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import request from "services/request";
 import useTitle from "utils/hooks/useTitle";
-import "./income.css";
+import "./expense.css";
 
-const Income = () => {
-  useTitle("Receitas");
+const Expense = () => {
+  useTitle("Despesas");
 
   const [user, setUser] = useState(null);
-  const [incomes, setIncomes] = useState([]);
-  const [filteredIncomes, setFilteredIncomes] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [tableRows, setTableRows] = useState([]);
   const [selected, setSelected] = useState([]);
   const [categories, setCategories] = useState({});
   const [dates, setDates] = useState({});
 
-  const [descriptionFilter, setDescriptionFilter] = useState("");
-  const [valueFilter, setValueFilter] = useState(0);
+  const [paidFilter, setPaidFilter] = useState(-1);
   const [dateFilter, setDateFilter] = useState("");
-  const [categoryFilter, setCategororyFilter] = useState("");
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState(0);
+  const [numberOfParcelsFilter, setNumberOfParcelsFilter] = useState("");
+
+  const paymentMethods = {
+    1: "Crédito",
+    2: "Débito",
+    3: "Dinheiro",
+  };
 
   const navigate = useNavigate();
 
@@ -42,11 +48,11 @@ const Income = () => {
     } catch (error) {}
   };
 
-  const getIncomes = async () => {
+  const getExpenses = async () => {
     try {
-      const response = await request.get(`/income/all/user/${user.id}`);
+      const response = await request.get(`/expense/user/${user.id}`);
       if (response.status === 200) {
-        setIncomes(response.data);
+        setExpenses(response.data);
       }
     } catch (error) {}
   };
@@ -66,51 +72,54 @@ const Income = () => {
   };
 
   useEffect(() => {
-    const ids = new Set(incomes.map((income) => income.categoryId));
+    const ids = new Set(expenses.map((expense) => expense.categoryId));
     getCategories(ids);
 
     let datesAux = {};
 
-    incomes.forEach((income) => {
-      datesAux[income.id] = new Date(income.date).toLocaleDateString();
+    expenses.forEach((expense) => {
+      datesAux[expense.id] = new Date(expense.dueDate).toLocaleDateString();
     });
 
     setDates(datesAux);
-  }, [incomes]);
+  }, [expenses]);
 
   useEffect(() => {
-    const rows = filteredIncomes.map((income) => {
+    const rows = filteredExpenses.map((expense) => {
       return (
         <tr
-          key={income.id}
+          key={expense.id}
           onClick={() => {
-            if (selected.id === income.id) {
+            if (selected.id === expense.id) {
               setSelected({});
             } else {
               setSelected({});
-              setSelected({ id: income.id });
+              setSelected({ id: expense.id });
             }
           }}
-          className={selected.id === income.id ? "selected" : ""}
+          className={selected.id === expense.id ? "selected" : ""}
         >
-          <td>{income.description}</td>
-          <td>{income.value}</td>
-          <td>{dates[income.id]}</td>
-          <td>{categories[income.categoryId]?.name}</td>
+          <td>{expense.description}</td>
+          <td>{categories[expense.categoryId]?.name}</td>
+          <td>{expense.value}</td>
+          <td>{paymentMethods[expense.paymentMethod]}</td>
+          <td>{expense.numberOfParcels}</td>
+          <td>{expense.isPaid ? "Sim" : "Não"}</td>
+          <td>{dates[expense.id]}</td>
         </tr>
       );
     });
 
     setTableRows(rows);
-  }, [filteredIncomes, selected, categories, dates]);
+  }, [filteredExpenses, selected, categories, dates]);
 
   useEffect(() => {
     filter();
-  }, [incomes]);
+  }, [expenses]);
 
   useEffect(() => {
     if (user) {
-      getIncomes();
+      getExpenses();
     }
   }, [user]);
 
@@ -119,49 +128,48 @@ const Income = () => {
   }, []);
 
   const filter = () => {
-    let incomesAux = incomes;
+    let expensesAux = expenses;
 
-    if (descriptionFilter.length !== 0) {
-      incomesAux = incomesAux.filter((income) => {
-        return new RegExp(descriptionFilter, "gi").test(income.description);
-      });
-    }
-
-    if (valueFilter !== 0) {
-      incomesAux = incomesAux.filter((income) => {
-        return income.value === valueFilter;
+    if (paidFilter !== -1) {
+      const value = paidFilter === 1 ? true : false;
+      expensesAux = expensesAux.filter((expense) => {
+        return expense.isPaid === value;
       });
     }
 
     if (dateFilter.length !== 0) {
-      incomesAux = incomesAux.filter((income) => {
-        return dateFilter === dates[income.id];
+      expensesAux = expensesAux.filter((expense) => {
+        return dateFilter === dates[expense.id];
       });
     }
 
-    if (categoryFilter.length !== 0) {
-      incomesAux = incomesAux.filter((income) => {
-        return new RegExp(categoryFilter, "gi").test(
-          categories[income.categoryId].name
-        );
+    if (paymentMethodFilter !== 0) {
+      expensesAux = expensesAux.filter((expense) => {
+        return expense.paymentMethod === paymentMethodFilter;
       });
     }
 
-    setFilteredIncomes(incomesAux);
+    if (numberOfParcelsFilter.length !== 0) {
+      expensesAux = expensesAux.filter((expense) => {
+        return expense.numberOfParcels === parseInt(numberOfParcelsFilter);
+      });
+    }
+
+    setFilteredExpenses(expensesAux);
   };
 
   const deleteSelected = async () => {
     if (selected.id) {
       try {
-        await request.delete(`/income/${selected.id}`);
-        await getIncomes();
+        await request.delete(`/expense/${selected.id}`);
+        await getExpenses();
       } catch {}
     }
   };
 
   return (
-    <div className="income-screen">
-      <Menu direction="vertical" className="income-menu">
+    <div className="expense-screen">
+      <Menu direction="vertical" className="expense-menu">
         <MenuItem
           title="Cartão"
           onClick={() => navigate("/card")}
@@ -193,22 +201,29 @@ const Income = () => {
           filterOptions={
             <>
               <FilterOption
-                type="text"
-                label="Descrição"
-                onChange={setDescriptionFilter}
-              />
+                type="select"
+                label="Quitado"
+                onChange={(value) => setPaidFilter(parseInt(value))}
+              >
+                <option value="-1">Todos</option>
+                <option value="1">Quitado</option>
+                <option value="0">Não quitado</option>
+              </FilterOption>
               <FilterOption
-                type="text"
-                label="Valor"
-                onChange={(value) => {
-                  setValueFilter(parseFloat(value));
-                }}
-              />
+                type="select"
+                label="Meio de pagamento"
+                onChange={(value) => setPaymentMethodFilter(parseInt(value))}
+              >
+                <option value="0">Todos</option>
+                <option value="1">Crédito</option>
+                <option value="2">Débito</option>
+                <option value="3">Dinheiro</option>
+              </FilterOption>
               <FilterOption type="text" label="Data" onChange={setDateFilter} />
               <FilterOption
                 type="text"
-                label="Categoria"
-                onChange={setCategororyFilter}
+                label="Número de parcelas"
+                onChange={setNumberOfParcelsFilter}
               />
             </>
           }
@@ -220,12 +235,14 @@ const Income = () => {
               <Button
                 title="Atualizar"
                 className="update-button"
-                onClick={() => navigate(`/income/edit/${selected.id}`)}
+                onClick={() =>
+                  selected.id && navigate(`/expense/edit/${selected.id}`)
+                }
               />
               <Button
-                title="Adicionar receita"
+                title="Adicionar despesa"
                 className="add-button"
-                onClick={() => selected.id && navigate("/income/add")}
+                onClick={() => navigate("/expense/add")}
               />
               <Button
                 title="Deletar"
@@ -239,9 +256,12 @@ const Income = () => {
           <thead>
             <tr>
               <th>Descrição</th>
-              <th>Valor (R$)</th>
-              <th>Data</th>
               <th>Categoria</th>
+              <th>Valor (R$)</th>
+              <th>Método de pagamento</th>
+              <th>Número de parcelas</th>
+              <th>Está pago?</th>
+              <th>Data de vencimento</th>
             </tr>
           </thead>
           <tbody>{tableRows}</tbody>
@@ -251,4 +271,4 @@ const Income = () => {
   );
 };
 
-export default Income;
+export default Expense;

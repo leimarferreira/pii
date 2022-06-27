@@ -1,11 +1,12 @@
 import { useRef } from "react";
 import "./checkbox.css";
 
-const Checkbox = ({ label, name, onChange }) => {
+const Checkbox = ({ label, name, onChange, value }) => {
   const checkboxRef = useRef(null);
 
   const onCheckBoxClick = () => {
     checkboxRef.current.checked = !checkboxRef.current.checked;
+    onChange(checkboxRef.current.checked);
   };
 
   const onCheck = (event) => {
@@ -21,6 +22,8 @@ const Checkbox = ({ label, name, onChange }) => {
         type="checkbox"
         ref={checkboxRef}
         onChange={onCheck}
+        value={value}
+        checked={value}
       />
       <span className="checkmark"></span>
       <label htmlFor={name}>{label}</label>

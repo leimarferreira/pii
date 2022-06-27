@@ -1,3 +1,3 @@
 package pii.dto;
 
-public record JwtTokenDTO(String token) {}
+public record JwtTokenDTO(String token, String role) {}

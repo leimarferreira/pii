@@ -127,7 +127,7 @@ public class UserDAO {
 			updateUser.setString(1, user.name());
 			updateUser.setString(2, user.email());
 			updateUser.setString(3, user.avatar());
-			updateUser.setLong(4, user.id());
+			updateUser.setLong(4, id);
 			updateUser.executeUpdate();
 		} catch (SQLException exception) {
 			if (exception instanceof SQLIntegrityConstraintViolationException) {

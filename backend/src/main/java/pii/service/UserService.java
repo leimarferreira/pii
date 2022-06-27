@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 
 import pii.dto.UserDTO;
 import pii.dto.UserDTOMapper;
+import pii.exception.NotFoundException;
+import pii.model.User;
+import pii.model.UserCredentials;
 import pii.repository.UserRepository;
+import pii.util.security.JWTUtil;
 
 @Service
 public class UserService {
@@ -17,6 +21,10 @@ public class UserService {
 	private UserRepository repository;
 	@Autowired
 	private UserDTOMapper mapper;
+	@Autowired
+	private UserCredentialsService userCredentialsService;
+	@Autowired
+	private JWTUtil jwtUtil;
 
 	public List<UserDTO> findAll() {
 		return repository.findAll()
@@ -46,6 +54,13 @@ public class UserService {
 
 		return Optional.empty();
 	}
+	
+	public Optional<UserDTO> findCurrentUser(String token) {
+		var jwt = token.substring(7);
+		var email = jwtUtil.validateTokenAndRetrieveSubject(jwt);
+		
+		return repository.findByEmail(email).map(user -> mapper.toDTO(user));
+	}
 
 	public Optional<UserDTO> save(UserDTO userDTO) {
 		var user = mapper.toObj(userDTO);
@@ -62,8 +77,10 @@ public class UserService {
 	public Optional<UserDTO> update(Long id, UserDTO userDTO) {
 		var user = mapper.toObj(userDTO);
 		var result = repository.update(id, user);
+		System.err.println(result.get().email());
 
 		if (result.isPresent()) {
+			updateCredentials(result.get());
 			var dto = mapper.toDTO(result.get());
 			return Optional.of(dto);
 		}
@@ -73,5 +90,13 @@ public class UserService {
 
 	public boolean delete(Long id) {
 		return repository.delete(id);
+	}
+	
+	private void updateCredentials(User user) {
+		var currentCredentials = userCredentialsService.findByUserId(user.id())
+				.orElseThrow(() -> new NotFoundException("Credenciais de usuário não encontradas no sistema."));
+		
+		var newCrendetials = new UserCredentials(currentCredentials.id(), user.email(), currentCredentials.password(), currentCredentials.role());
+		userCredentialsService.update(currentCredentials.id(), newCrendetials);
 	}
 }
