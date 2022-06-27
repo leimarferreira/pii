@@ -26,9 +26,9 @@ public class UserFinancialDataService {
 			var totalCards = getTotalCards(userId);
 			
 			var balance = new BigDecimal(0);
-			balance.add(totalCards);
-			balance.add(totalIncomes);
-			balance.subtract(totalExpenses);
+			balance = balance.add(totalCards);
+			balance = balance.add(totalIncomes);
+			balance = balance.subtract(totalExpenses);
 			
 			var data = new UserFinancialData(userId, totalExpenses, totalIncomes, totalCards, balance);
 			return Optional.of(data);
@@ -40,29 +40,35 @@ public class UserFinancialDataService {
 
 	private BigDecimal getTotalIncomes(long userId) {
 		BigDecimal total = new BigDecimal(0);
-		incomeService.findAllByUserId(userId).forEach(income -> {
-			total.add(income.value());
-		});
+		var incomes = incomeService.findAllByUserId(userId);
+		for (var income : incomes) {
+			total = total.add(income.value());
+		}
 
 		return total;
 	}
 
 	private BigDecimal getTotalExpenses(long userId) {
 		BigDecimal total = new BigDecimal(0);
-		expenseService.findAllByUserId(userId)
-				.forEach(expense -> total.add(expense.value()));
+		var expenses = expenseService.findAllByUserId(userId);
+		
+		for (var expense : expenses) {
+			total = total.add(expense.value());
+		}
+		
 		return total;
 	}
 	
 	private BigDecimal getTotalCards(long userId) {
 		BigDecimal total = new BigDecimal(0);
-		cardService.findAllByUserId(userId).forEach(card -> {
+		var cards = cardService.findAllByUserId(userId);
+		for (var card : cards ) {
 			if (card.type() == CardType.CREDIT.getValue()) {
-				total.add(card.limit());
+				total = total.add(card.limit());
 			} else if (card.type() == CardType.DEBIT.getValue()) {
-				total.add(card.currentValue());
+				total = total.add(card.currentValue());
 			}
-		});
+		}
 		
 		return total;
 	}
