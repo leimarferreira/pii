@@ -8,7 +8,7 @@
 .user-menu {
   position: sticky;
   margin: 80px 0 auto 1%;
-  height: 60vh;
+  height: 70vh;
 }
 
 .user-form-container {
@@ -23,6 +23,6 @@
   color: #f00;
 }
 
-.logout-option, .logout-icon {
+.important-action, .important-icon {
   color: #f00;
 }

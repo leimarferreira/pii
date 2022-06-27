@@ -3,6 +3,7 @@ import {
   faCreditCard,
   faGear,
   faMoneyBillTrendUp,
+  faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FilePicker from "components/Form/Field/FilePicker/filePicker";
@@ -72,6 +73,18 @@ const UserSettings = () => {
   const logout = () => {
     authService.logout();
     navigate("/login");
+  };
+
+  const deleteAccount = async () => {
+    try {
+      const response = await request.delete(`/user/${user.id}`);
+
+      if (response.status === 200) {
+        authService.logout();
+        navigate("/login");
+      }
+      // eslint-disable-next-line no-empty
+    } catch {}
   };
 
   const submitData = async () => {
@@ -168,11 +181,21 @@ const UserSettings = () => {
           icon={<FontAwesomeIcon icon={faGear} />}
         />
         <MenuItem
-          className="logout-option"
+          className="important-action"
+          title="Apagar conta"
+          onClick={() => deleteAccount()}
+          icon={
+            <span className="important-icon">
+              <FontAwesomeIcon icon={faTrashCan} />
+            </span>
+          }
+        />
+        <MenuItem
+          className="important-action"
           title="Sair da conta"
           onClick={() => logout()}
           icon={
-            <span className="logout-icon">
+            <span className="important-icon">
               <FontAwesomeIcon icon={faArrowRightFromBracket} />
             </span>
           }
