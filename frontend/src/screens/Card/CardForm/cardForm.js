@@ -11,12 +11,15 @@ import MenuItem from "components/Menu/MenuItem/menuItem";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import request from "services/request";
+import useTitle from "utils/hooks/useTitle";
 import "./cardForm.css";
 
 const CardForm = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   let { id } = useParams();
+
+  const [title, setTitle] = useState("");
 
   const [edit, setEdit] = useState(false);
 
@@ -43,7 +46,17 @@ const CardForm = () => {
       setLimit(card.limit);
       setDueDate(card.dueDate);
     }
+
+    if (edit) {
+      setTitle("Editar cartão");
+    } else {
+      setTitle("Adicionar cartão");
+    }
   }, [edit, card]);
+
+  useEffect(() => {
+    useTitle(title);
+  }, [title]);
 
   useEffect(() => {
     getCard();

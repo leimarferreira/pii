@@ -9,6 +9,8 @@ import Register from "./screens/Auth/Register/register";
 import Home from "./screens/Home/home";
 import IncomeForm from "screens/Income/IncomeForm/incomeForm";
 import Income from "screens/Income/income";
+import Expense from "screens/Expense/expense";
+import ExpenseForm from "screens/Expense/ExpenseForm/expenseForm";
 
 const AppRoutes = () => {
   return (
@@ -21,6 +23,9 @@ const AppRoutes = () => {
         <Route path="income" element={<Income />} />
         <Route path="income/add" element={<IncomeForm />} />
         <Route path="income/edit/:id" element={<IncomeForm />} />
+        <Route path="expense" element={<Expense />} />
+        <Route path="expense/add" element={<ExpenseForm />} />
+        <Route path="expense/edit/:id" element={<ExpenseForm />} />
       </Route>
       <Route path="/auth" element={<Auth />}>
         <Route path="register" element={<Register />} />

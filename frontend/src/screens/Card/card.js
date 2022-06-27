@@ -216,7 +216,7 @@ const Card = () => {
               <Button
                 title="Criar novo cartão"
                 className="add-button"
-                onClick={() => navigate("/card/add")}
+                onClick={() => selected.id && navigate("/card/add")}
               />
               <Button
                 title="Deletar"

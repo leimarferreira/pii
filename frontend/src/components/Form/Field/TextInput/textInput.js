@@ -10,6 +10,7 @@ const TextInput = ({
   onChange,
   className,
   label,
+  min,
 }) => {
   const inputRef = useRef(null);
 
@@ -35,6 +36,7 @@ const TextInput = ({
       >
         {icon && <span className="form-field-left-icon">{icon}</span>}
         <input
+          min={min}
           type={type}
           name={name}
           placeholder={placeholder}
