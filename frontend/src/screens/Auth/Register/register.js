@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Form, { Checkbox, Submit, TextInput } from "components/Form/form";
+import Form, { Submit, TextInput } from "components/Form/form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser,
@@ -22,7 +22,6 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordValid, setPasswordValid] = useState(false);
   const [isPasswordConfirmed, setPasswordConfirmed] = useState(false);
-  const [areUseTermsAccepted, setUserTermsAccepted] = useState(false);
   const [hasError, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -36,7 +35,6 @@ const Register = () => {
     }
   }, [password, confirmPassword]);
 
-  // TODO: passar a validação para dentro do campo e exibir uma mensagem de erro
   const validatePassword = () => {
     setPasswordValid(
       password.length >= 8 && // deve ter no mínimo 8 caracteres
@@ -164,17 +162,15 @@ const Register = () => {
             }}
           />
           <div className="register-form-footer">
-            <Checkbox
+            {/* <Checkbox
               name="terms-of-use"
               label="Eu aceito os termos de uso"
               onChange={setUserTermsAccepted}
-            />
+            /> */}
             <Submit
               type="submit"
               value="Registrar-se"
-              disabled={
-                !(isPasswordValid && isPasswordConfirmed && areUseTermsAccepted)
-              }
+              disabled={!(isPasswordValid && isPasswordConfirmed)}
             />
             <span className="login-screen-link">
               Já tem uma conta? <Link to="/login">Entre</Link>

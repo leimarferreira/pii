@@ -1,10 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { TextInput } from "components/Form/form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMagnifyingGlass,
-  faCircleUser,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import "./header.css";
 import { useEffect, useState } from "react";
 import request from "services/request";
@@ -26,14 +22,14 @@ const Header = () => {
         <span className="sitename-abbr">CG</span>
         <span className="sitename">Controle de Gastos</span>
       </div>
-      <div className="search-box">
+      {/* <div className="search-box">
         <TextInput
           className="search-input"
           type="search"
           placeholder="Buscar"
           icon={<FontAwesomeIcon icon={faMagnifyingGlass} />}
         />
-      </div>
+      </div> */}
       <div className="user-link" onClick={() => navigate("/user")}>
         {user.avatar ? (
           <div className="user-avatar">
