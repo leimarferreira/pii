@@ -24,6 +24,7 @@ public record ExpenseDTO(
 		@Min(value = 1, message = "Valor mínimo é 1.")
 		Integer numberOfParcels, // apenas se for crédito
 		Boolean isPaid,
-		@Min(value = 1, message = "Valor mínimo é 1.")
-		Long cardId
+		@Min(value = 0, message = "Valor mínimo é 1.")
+		long cardId,
+		Long dueDate
 ) {}

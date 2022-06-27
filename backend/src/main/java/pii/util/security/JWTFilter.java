@@ -45,11 +45,13 @@ public class JWTFilter extends OncePerRequestFilter {
 			} else {
 				try {
 					var email = jwtUtil.validateTokenAndRetrieveSubject(jwt);
-					var userCredentials = userCredentialsService.findByUserEmail(email).get();
-					var authToken = new UsernamePasswordAuthenticationToken(email, userCredentials.password(),
-							getAuthorities(userCredentials.role().name()));
-					if (SecurityContextHolder.getContext().getAuthentication() == null) {
-						SecurityContextHolder.getContext().setAuthentication(authToken);
+					var userCredentials = userCredentialsService.findByUserEmail(email);
+					if (userCredentials.isPresent()) {
+						var authToken = new UsernamePasswordAuthenticationToken(email, userCredentials.get().password(),
+								getAuthorities(userCredentials.get().role().name()));
+						if (SecurityContextHolder.getContext().getAuthentication() == null) {
+							SecurityContextHolder.getContext().setAuthentication(authToken);
+						}
 					}
 				} catch (JWTVerificationException exception) {
 					response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Token inválido.");

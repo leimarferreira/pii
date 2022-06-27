@@ -17,7 +17,8 @@ public class ExpenseDTOMapper {
 				expense.paymentMethod().getValue(),
 				expense.numberOfParcels(),
 				expense.isPaid(),
-				expense.cardId());
+				expense.cardId(),
+				expense.dueDate());
 	}
 	
 	public Expense dtoToObj(ExpenseDTO dto) {
@@ -30,6 +31,7 @@ public class ExpenseDTOMapper {
 				dto.paymentMethod(),
 				dto.numberOfParcels(),
 				dto.isPaid(),
-				dto.cardId());
+				dto.cardId(),
+				dto.dueDate());
 	}
 }

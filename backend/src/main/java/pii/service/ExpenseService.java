@@ -80,19 +80,21 @@ public class ExpenseService {
 	}
 	
 	private void validateExpense(Expense expense) {
-		var card = cardService.findByNumber(expense.cardId())
-				.orElseThrow(() -> new NotFoundException("Cartão não encontrado."));
-		
-		if ((expense.paymentMethod() == PaymentMethod.CREDIT && CardType.valueOf(card.type()).get() != CardType.CREDIT)
-				|| (expense.paymentMethod() == PaymentMethod.DEBIT && CardType.valueOf(card.type()).get() != CardType.DEBIT)) {
-			throw new ConflictException("Cartão imcompatível com método de pagamento utilizado.");
-		}
-		
-		if (expense.paymentMethod() == PaymentMethod.CREDIT && expense.value().compareTo(card.limit()) == 1) {
-			throw new ConflictException("Valor da despesa ultrapassa limite do cartão de crédito.");
-		} else if (expense.paymentMethod() == PaymentMethod.DEBIT
-				&& expense.value().compareTo(card.currentValue()) == 1) {
-			throw new ConflictException("Cartão de débito não possui saldo suficiente.");
+		if (expense.paymentMethod() != PaymentMethod.MONEY) {
+			var card = cardService.findById(expense.cardId())
+					.orElseThrow(() -> new NotFoundException("Cartão não encontrado."));
+			
+			if ((expense.paymentMethod() == PaymentMethod.CREDIT && CardType.valueOf(card.type()).get() != CardType.CREDIT)
+					|| (expense.paymentMethod() == PaymentMethod.DEBIT && CardType.valueOf(card.type()).get() != CardType.DEBIT)) {
+				throw new ConflictException("Cartão imcompatível com método de pagamento utilizado.");
+			}
+			
+			if (expense.paymentMethod() == PaymentMethod.CREDIT && expense.value().compareTo(card.limit()) == 1) {
+				throw new ConflictException("Valor da despesa ultrapassa limite do cartão de crédito.");
+			} else if (expense.paymentMethod() == PaymentMethod.DEBIT
+					&& expense.value().compareTo(card.currentValue()) == 1) {
+				throw new ConflictException("Cartão de débito não possui saldo suficiente.");
+			}
 		}
 	}
 }

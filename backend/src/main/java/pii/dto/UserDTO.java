@@ -24,7 +24,7 @@ public record UserDTO (
 		@Email(message = "O campo não possui um formato válido.")
 		@JsonInclude(Include.NON_NULL)
 		String email,
-		@Size(max = 2048, message = "Tamanho máximo de 2048 caracteres.")
+		@Size(max = 16777216, message = "Tamanho máximo de 2048 caracteres.")
 		@JsonInclude(Include.NON_NULL)
 		String avatar
 ) {

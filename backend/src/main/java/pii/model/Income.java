@@ -18,7 +18,7 @@ public record Income(
 				id,
 				userId,
 				value,
-				LocalDateTime.ofInstant(Instant.ofEpochMilli(date), ZoneOffset.UTC),
+				LocalDateTime.ofInstant(Instant.ofEpochSecond(date), ZoneOffset.UTC),
 				description,
 				categoryId
 		);

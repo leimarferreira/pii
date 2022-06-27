@@ -13,9 +13,10 @@ public record Expense(
 		PaymentMethod paymentMethod,
 		Integer numberOfParcels, // apenas se for crédito
 		Boolean isPaid,
-		Long cardId
+		long cardId,
+		Long dueDate
 ) {
-	public Expense(Long id, Long userId, BigDecimal value, String description, Long categoryId, Integer paymentMethod, Integer numberOfParcels, Boolean isPaid, Long cardId) {
-		this(id, userId, value, description, categoryId, PaymentMethod.valueOf(paymentMethod).get(), numberOfParcels, isPaid, cardId);
+	public Expense(Long id, Long userId, BigDecimal value, String description, Long categoryId, Integer paymentMethod, Integer numberOfParcels, Boolean isPaid, long cardId, Long dueDate) {
+		this(id, userId, value, description, categoryId, PaymentMethod.valueOf(paymentMethod).get(), numberOfParcels, isPaid, cardId, dueDate);
 	}
 }

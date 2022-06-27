@@ -40,7 +40,8 @@ public class ExpenseDAO {
 						result.getInt("payment_method"),
 						result.getInt("number_of_parcels"),
 						result.getBoolean("is_paid"),
-						result.getLong("card_id"));
+						result.getLong("card_id"),
+						result.getLong("due_date"));
 				
 				expenses.add(expense);
 			}
@@ -71,7 +72,8 @@ public class ExpenseDAO {
 						result.getInt("payment_method"),
 						result.getInt("number_of_parcels"),
 						result.getBoolean("is_paid"),
-						result.getLong("card_id"));
+						result.getLong("card_id"),
+						result.getLong("due_date"));
 				
 				expenses.add(expense);
 			}
@@ -102,7 +104,8 @@ public class ExpenseDAO {
 						result.getInt("payment_method"),
 						result.getInt("number_of_parcels"),
 						result.getBoolean("is_paid"),
-						result.getLong("card_id"));
+						result.getLong("card_id"),
+						result.getLong("due_date"));
 				
 				expenses.add(expense);
 			}
@@ -132,7 +135,8 @@ public class ExpenseDAO {
 						result.getInt("payment_method"),
 						result.getInt("number_of_parcels"),
 						result.getBoolean("is_paid"),
-						result.getLong("card_id"));
+						result.getLong("card_id"),
+						result.getLong("due_date"));
 				
 				return Optional.of(expense);
 			}
@@ -145,8 +149,8 @@ public class ExpenseDAO {
 	
 	public Optional<Long> save(Expense expense) {
 		var statement = """
-				INSERT INTO expenses (user_id, value, description, category_id, payment_method, number_of_parcels, is_paid, card_id)
-				VALUES (?, ?, ?, ?, ?, ?, ?)
+				INSERT INTO expenses (user_id, value, description, category_id, payment_method, number_of_parcels, is_paid, card_id, due_date)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 				""";
 		
 		try (var insertExpense = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
@@ -158,6 +162,7 @@ public class ExpenseDAO {
 			insertExpense.setInt(6, expense.numberOfParcels());
 			insertExpense.setBoolean(7, expense.isPaid());
 			insertExpense.setLong(8, expense.cardId());
+			insertExpense.setLong(9, expense.dueDate());
 			
 			insertExpense.executeUpdate();
 			
@@ -180,7 +185,8 @@ public class ExpenseDAO {
 					payment_method = ?,
 					number_of_parcels = ?,
 					is_paid = ?,
-					card_id = ?
+					card_id = ?,
+					due_date = ?
 				WHERE id = ?
 				""";
 		
@@ -193,7 +199,8 @@ public class ExpenseDAO {
 			updateExpense.setInt(6, expense.numberOfParcels());
 			updateExpense.setBoolean(7, expense.isPaid());
 			updateExpense.setLong(8, expense.cardId());
-			updateExpense.setLong(9, id);
+			updateExpense.setLong(9, expense.dueDate());
+			updateExpense.setLong(10, id);
 			
 			updateExpense.executeUpdate();
 		} catch (SQLException exception) {

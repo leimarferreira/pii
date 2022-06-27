@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import pii.dto.UserDTO;
+import pii.dto.UserFinancialData;
+import pii.service.UserFinancialDataService;
 import pii.service.UserService;
 
 @RestController
@@ -26,6 +29,9 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private UserFinancialDataService userFinancialDataService;
 	
 	@GetMapping
 	public ResponseEntity<Iterable<UserDTO>> getAll() {
@@ -61,6 +67,16 @@ public class UserController {
 		}
 		
 		return ResponseEntity.status(status).body(result);
+	}
+	
+	@GetMapping("/current")
+	public ResponseEntity<Optional<UserDTO>> getCurrentUser(@RequestHeader(name = "Authorization") String token) {
+		return ResponseEntity.status(HttpStatus.OK).body(userService.findCurrentUser(token));
+	}
+	
+	@GetMapping("/data/{id}")
+	public ResponseEntity<Optional<UserFinancialData>> getFinancialData(@PathVariable(name = "id") long userId) {
+		return ResponseEntity.status(HttpStatus.OK).body(userFinancialDataService.getUserFinancialData(userId));
 	}
 	
 	@PostMapping
