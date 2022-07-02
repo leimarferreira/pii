@@ -1,5 +1,11 @@
 package pii.service;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +19,7 @@ import pii.enums.PaymentMethod;
 import pii.exception.ConflictException;
 import pii.exception.NotFoundException;
 import pii.model.Expense;
+import pii.model.Parcel;
 import pii.repository.ExpenseRepository;
 
 @Service
@@ -26,6 +33,12 @@ public class ExpenseService {
 	
 	@Autowired
 	private CardService cardService;
+	
+	@Autowired
+	private InvoiceService invoiceService;
+	
+	@Autowired
+	private ParcelService parcelService;
 	
 	public List<ExpenseDTO> findAll() {
 		return repository
@@ -62,8 +75,17 @@ public class ExpenseService {
 		
 		validateExpense(expense);
 		
-		return repository.save(expense)
-				.map(dtoMapper::objToDTO);
+		var result = repository.save(expense);
+		
+		if (result.isPresent()) {
+			var savedExpense = result.get();
+			
+			if (savedExpense.paymentMethod() == PaymentMethod.CREDIT) {
+				addExpenseToInvoices(savedExpense);
+			}
+		}
+		
+		return result.map(dtoMapper::objToDTO);
 	}
 	
 	public Optional<ExpenseDTO> update(Long id, ExpenseDTO dto) {
@@ -71,8 +93,19 @@ public class ExpenseService {
 		
 		validateExpense(expense);
 		
-		return repository.update(id, expense)
-				.map(dtoMapper::objToDTO);
+		var result = repository.update(id, expense);
+		
+		if (result.isPresent()) {
+			var updatedExpense = result.get();
+			
+			parcelService.deleteAllByExpenseId(updatedExpense.id());
+			
+			if (updatedExpense.paymentMethod() == PaymentMethod.CREDIT) {
+				addExpenseToInvoices(updatedExpense);
+			}
+		}
+		
+		return result.map(dtoMapper::objToDTO);
 	}
 	
 	public Boolean delete(Long id) {
@@ -88,12 +121,42 @@ public class ExpenseService {
 					|| (expense.paymentMethod() == PaymentMethod.DEBIT && CardType.valueOf(card.type()).get() != CardType.DEBIT)) {
 				throw new ConflictException("Cartão imcompatível com método de pagamento utilizado.");
 			}
+		}
+		
+		// TODO: verificar se a despesa não ultrapassa o limite do cartão de crédito
+		// TODO: verificar se a despesa não ultrapassa o saldo do cartão de débito
+	}
+	
+	private void addExpenseToInvoices(Expense expense) {
+		var card = cardService.findById(expense.cardId())
+				.orElseThrow(() -> new NotFoundException("Cartão não encontrado no sistema."));
+		var dueDay = expense.dueDate().getDayOfMonth();
+		var currentYear = expense.dueDate().getYear();
+		
+		var month = LocalDate.ofInstant(Instant.now(), ZoneOffset.UTC).getMonthValue();
+		
+		if (dueDay > card.dueDate()) {
+			++month;
+		}
+		
+		var valuePerParcel = expense.value().divide(new BigDecimal(expense.numberOfParcels()), 2, RoundingMode.HALF_UP);
+		
+		for (int i = 1; i <= expense.numberOfParcels(); i++, month++) {
+			var date = String.format("%d/%d", month, currentYear);
 			
-			if (expense.paymentMethod() == PaymentMethod.CREDIT && expense.value().compareTo(card.limit()) == 1) {
-				throw new ConflictException("Valor da despesa ultrapassa limite do cartão de crédito.");
-			} else if (expense.paymentMethod() == PaymentMethod.DEBIT
-					&& expense.value().compareTo(card.currentValue()) == 1) {
-				throw new ConflictException("Cartão de débito não possui saldo suficiente.");
+			var invoice = invoiceService.getInvoiceByMonthAndCardId(date, expense.cardId())
+					.orElseThrow(() -> new ConflictException("Erro ao adicionar despesa à fatura."));
+			
+			var dueDate = LocalDate.of(currentYear, month, dueDay);
+			
+			var parcel = new Parcel(
+					0, expense.id(), invoice.id(), i, dueDate, valuePerParcel);
+			
+			parcelService.save(parcel);
+			
+			if (month == 12) {
+				currentYear++;
+				month = 1;
 			}
 		}
 	}
