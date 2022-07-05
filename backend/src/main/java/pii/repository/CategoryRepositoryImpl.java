@@ -43,6 +43,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
 	@Override
 	public Optional<Category> update(Long id, Category category) {
+		categoryDAO.update(id, category);
 		return categoryDAO.findById(id);
 	}
 

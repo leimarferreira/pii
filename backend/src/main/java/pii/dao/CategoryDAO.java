@@ -145,6 +145,7 @@ public class CategoryDAO {
 		var statement = "DELETE FROM category WHERE id = ?";
 		
 		try (var deleteCategory = connection.prepareStatement(statement)) {
+			deleteCategory.setLong(1, id);
 			var result = deleteCategory.executeUpdate();
 			
 			return result > 0;
