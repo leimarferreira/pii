@@ -23,4 +23,6 @@ public interface InvoiceRepository {
 	public Optional<Invoice> update(long id, Invoice invoice);
 	
 	public boolean delete(long id);
+	
+	public boolean deleteAllEmptyInvoices();
 }

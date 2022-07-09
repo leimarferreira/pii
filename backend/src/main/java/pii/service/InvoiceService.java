@@ -60,6 +60,10 @@ public class InvoiceService {
 		return repository.delete(id);
 	}
 	
+	public boolean deleteAllEmptyInvoices() {
+		return repository.deleteAllEmptyInvoices();
+	}
+	
 	public Optional<Invoice> getInvoiceByMonthAndCardId(String month, long cardId) {
 		var result = repository.findByMonthAndCardId(month, cardId);
 		

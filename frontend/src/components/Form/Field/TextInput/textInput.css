@@ -59,3 +59,12 @@
 .form-field-right-icon:hover ~ .error-message-popover {
   display: flex;
 }
+
+.disabled {
+  background-color: #ddd;
+}
+
+input:disabled {
+  cursor: not-allowed;
+  background-color: #ddd;
+}

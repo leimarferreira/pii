@@ -72,11 +72,6 @@ public class InvoiceDAO {
 		}
 	}
 	
-// TODO: ver se precisa desse método mesmo
-//	public List<Invoice> findAllByExpenseId() {
-//		
-//	}
-	
 	public Optional<Invoice> findById(long id) {
 		var query = "SELECT * FROM invoices WHERE id = ?";
 		
@@ -178,6 +173,23 @@ public class InvoiceDAO {
 		try (var deleteInvoice = connection.prepareStatement(statement)) {
 			deleteInvoice.setLong(1, id);
 			
+			var result = deleteInvoice.executeUpdate();
+			return result > 0;
+		} catch (SQLException exception) {
+			var message = "Erro ao deletar fatura";
+			logger.error(message, exception);
+			throw new UncheckedSQLException(message, exception);
+		}
+	}
+	
+	public boolean deleteAllEmptyInvoices() {
+		var statement = """
+				DELETE invoices FROM invoices
+				LEFT JOIN parcel ON parcel.invoice_id = invoices.id
+				WHERE parcel.id IS NULL
+				""";
+		
+		try (var deleteInvoice = connection.prepareStatement(statement)) {
 			var result = deleteInvoice.executeUpdate();
 			return result > 0;
 		} catch (SQLException exception) {

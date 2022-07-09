@@ -61,4 +61,9 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
 		return invoiceDAO.delete(id);
 	}
 
+	@Override
+	public boolean deleteAllEmptyInvoices() {
+		return invoiceDAO.deleteAllEmptyInvoices();
+	}
+
 }

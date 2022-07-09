@@ -1,0 +1,7 @@
+.th-clickable {
+  cursor: pointer;
+}
+
+.th-selected {
+  background-color: #ddd;
+}

@@ -12,6 +12,9 @@ import Income from "screens/Income/income";
 import Expense from "screens/Expense/expense";
 import ExpenseForm from "screens/Expense/ExpenseForm/expenseForm";
 import UserSettings from "screens/UserSettings/userSettings";
+import Category from "screens/Category/category";
+import Invoice from "screens/Invoice/invoice";
+import InvoiceView from "screens/Invoice/InvoiceView/invoiceView";
 
 const AppRoutes = () => {
   return (
@@ -28,6 +31,12 @@ const AppRoutes = () => {
         <Route path="expense/add" element={<ExpenseForm />} />
         <Route path="expense/edit/:id" element={<ExpenseForm />} />
         <Route path="settings" element={<UserSettings />} />
+        <Route path="category" element={<Category />} />
+        <Route path="card/:id/invoice" element={<Invoice />} />
+        <Route
+          path="card/:cardId/invoice/:invoiceId"
+          element={<InvoiceView />}
+        />
       </Route>
       <Route path="/auth" element={<Auth />}>
         <Route path="register" element={<Register />} />

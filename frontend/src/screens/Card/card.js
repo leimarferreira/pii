@@ -65,7 +65,7 @@ const Card = () => {
               setSelected({});
             } else {
               setSelected({});
-              setSelected({ id: card.id });
+              setSelected(card);
             }
           }}
           className={selected.id === card.id ? "selected" : ""}
@@ -177,6 +177,7 @@ const Card = () => {
 
       <div className="main-content">
         <OptionsMenu
+          className="card-opt-menu"
           filterOptions={
             <>
               <FilterOption
@@ -220,6 +221,15 @@ const Card = () => {
           }
           sideButtons={
             <>
+              {selected.id && selected.type === 1 && (
+                <Button
+                  title="Faturas"
+                  className="invoice-button"
+                  onClick={() =>
+                    selected.id && navigate(`/card/${selected.id}/invoice`)
+                  }
+                />
+              )}
               <Button
                 title="Atualizar"
                 className="update-button"

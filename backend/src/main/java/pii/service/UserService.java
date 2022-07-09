@@ -77,7 +77,6 @@ public class UserService {
 	public Optional<UserDTO> update(Long id, UserDTO userDTO) {
 		var user = mapper.toObj(userDTO);
 		var result = repository.update(id, user);
-		System.err.println(result.get().email());
 
 		if (result.isPresent()) {
 			updateCredentials(result.get());

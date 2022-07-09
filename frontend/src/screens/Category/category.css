@@ -1,11 +1,11 @@
-.card-screen {
+.category-screen {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 100vh;
 }
 
-.card-menu {
+.category-menu {
   margin-left: 1%;
   height: 50vh;
 }
@@ -35,10 +35,7 @@
   background-color: #ff3e3e;
 }
 
-.invoice-button {
-  background-color: #3e3eff;
-}
-
-.card-opt-menu {
-  height: fit-content;
+.category-name-field,
+.category-name-field > input {
+  background-color: #ddd;
 }

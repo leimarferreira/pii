@@ -8,5 +8,7 @@ public record ParcelDTO(
 		long dueDate,
 		int parcelNumber,
 		int numberOfParcels,
-		BigDecimal value
+		BigDecimal value,
+		long expenseId,
+		long invoiceId
 ) {}

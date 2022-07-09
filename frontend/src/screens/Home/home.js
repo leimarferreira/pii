@@ -2,6 +2,7 @@
 import {
   faCreditCard,
   faGear,
+  faList,
   faMoneyBillTrendUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -88,6 +89,11 @@ const Home = () => {
               <FontAwesomeIcon icon={faMoneyBillTrendUp} />
             </span>
           }
+        />
+        <MenuItem
+          title="Categorias"
+          onClick={() => navigate("/category")}
+          icon={<FontAwesomeIcon icon={faList} />}
         />
         <MenuItem
           title="Ajuste"
