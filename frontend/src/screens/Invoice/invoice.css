@@ -1,11 +1,11 @@
-.card-screen {
+.invoice-screen {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 100vh;
 }
 
-.card-menu {
+.invoice-menu {
   margin-left: 1%;
   height: 50vh;
 }
@@ -23,22 +23,6 @@
   background-color: #3ea2ff;
 }
 
-.update-button {
-  background-color: #a06a00;
-}
-
-.add-button {
-  background-color: #00d408;
-}
-
-.delete-button {
-  background-color: #ff3e3e;
-}
-
-.invoice-button {
+.expense-button {
   background-color: #3e3eff;
-}
-
-.card-opt-menu {
-  height: fit-content;
 }

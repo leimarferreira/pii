@@ -37,6 +37,8 @@ public class DataLoader {
 		createCategoryTable();
 		createIncomeTable();
 		createExpenseTable();
+		createInvoiceTable();
+		createParcelTable();
 		createDefaultAdminAccount();
 	}
 	
@@ -53,9 +55,8 @@ public class DataLoader {
 				
 		try (var statement = connection.prepareStatement(sql)) {
 			statement.execute();
-			logger.info("Criada tabela 'user' no banco de dados.");
-		} catch (SQLException e) {
-			logger.error("Erro ao criar tabela de usuário.");
+		} catch (SQLException exception) {
+			logger.error("Erro ao criar 'user' no banco de dados.", exception);
 		}
 	}
 	
@@ -76,9 +77,8 @@ public class DataLoader {
 				""";
 		try (var statement = connection.prepareStatement(sql)) {
 			statement.execute();
-			logger.info("Criada tabela 'card' no banco de dados.");
 		} catch (SQLException exception) {
-			logger.error("Erro ao criar tabela de cartões.", exception);
+			logger.error("Erro ao criar tabela 'card' no banco de dados.", exception);
 		}
 	}
 	
@@ -95,9 +95,8 @@ public class DataLoader {
 				""";
 		try (var statement = connection.prepareStatement(sql)) {
 			statement.execute();
-			logger.info("Criada a tabela 'user_credentials' no banco de dados.");
 		} catch (SQLException exception) {
-			logger.error("Erro ao criar tabela 'user_credentials' no banco de dados.");
+			logger.error("Erro ao criar tabela 'user_credentials' no banco de dados.", exception);
 		}
 	}
 	
@@ -112,9 +111,8 @@ public class DataLoader {
 		
 		try (var statement = connection.prepareStatement(sql)) {
 			statement.execute();
-			logger.info("Criada a tabela 'category' no banco de dados.");
 		} catch (SQLException exception) {
-			logger.error("Erro ao criar tabela 'category' no banco de dados.");
+			logger.error("Erro ao criar tabela 'category' no banco de dados.", exception);
 		}
 	}
 	
@@ -135,9 +133,8 @@ public class DataLoader {
 		
 		try (var statement = connection.prepareStatement(sql)) {
 			statement.execute();
-			logger.info("Criada a tabela 'incomes' no banco de dados.");
 		} catch (SQLException exception) {
-			logger.error("Erro ao criar tabela 'incomes' no banco de dados.");
+			logger.error("Erro ao criar tabela 'incomes' no banco de dados.", exception);
 		}
 	}
 	
@@ -162,9 +159,49 @@ public class DataLoader {
 		
 		try (var statement = connection.prepareStatement(sql)) {
 			statement.execute();
-			logger.info("Criada a tabela 'expenses' no banco de dados.");
 		} catch (SQLException exception) {
-			logger.error("Erro ao criar tabela 'incomes' no banco de dados.");
+			logger.error("Erro ao criar tabela 'incomes' no banco de dados.", exception);
+		}
+	}
+	
+	private void createInvoiceTable() {
+		var sql = """
+				CREATE TABLE IF NOT EXISTS invoices (
+					id BIGINT NOT NULL AUTO_INCREMENT,
+					month VARCHAR(7) NOT NULL,
+					card_id BIGINT NOT NULL,
+					value DECIMAL(65, 30) NOT NULL,
+					PRIMARY KEY (id),
+					FOREIGN KEY (card_id) REFERENCES card(id) ON DELETE CASCADE
+				)
+				""";
+		
+		try (var statement = connection.prepareStatement(sql)) {
+			statement.execute();
+		} catch (SQLException exception) {
+			logger.error("Erro ao criar tabela 'invoice' no banco de dados.", exception);
+		}
+	}
+	
+	private void createParcelTable() {
+		var sql = """
+				CREATE TABLE IF NOT EXISTS parcel (
+					id BIGINT NOT NULL AUTO_INCREMENT,
+					expense_id BIGINT NOT NULL,
+					invoice_id BIGINT NOT NULL,
+					parcel_number INTEGER NOT NULL,
+					date BIGINT NOT NULL,
+					value DECIMAL(65, 30) NOT NULL,
+					PRIMARY KEY (id),
+					FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE CASCADE,
+					FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
+				)
+				""";
+		
+		try (var statement = connection.prepareStatement(sql)) {
+			statement.execute();
+		} catch (SQLException exception) {
+			logger.error("Erro ao criar tabela 'parcel' no banco de dados.", exception);
 		}
 	}
 	

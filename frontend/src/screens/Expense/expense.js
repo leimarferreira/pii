@@ -78,7 +78,9 @@ const Expense = () => {
     let datesAux = {};
 
     expenses.forEach((expense) => {
-      datesAux[expense.id] = new Date(expense.dueDate).toLocaleDateString();
+      datesAux[expense.id] = new Date(
+        expense.dueDate * 1000
+      ).toLocaleDateString();
     });
 
     setDates(datesAux);
@@ -252,7 +254,7 @@ const Expense = () => {
             </>
           }
         />
-        <Table title="Receitas">
+        <Table title="Despesas">
           <thead>
             <tr>
               <th>Descrição</th>

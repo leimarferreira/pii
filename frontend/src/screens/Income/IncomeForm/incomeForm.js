@@ -5,6 +5,7 @@ import {
   faMoneyBillTrendUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Select from "components/Form/Field/Select/select";
 import Form, { Submit, TextInput } from "components/Form/form";
 import Menu from "components/Menu/menu";
 import MenuItem from "components/Menu/MenuItem/menuItem";
@@ -34,8 +35,11 @@ const IncomeForm = () => {
   const [incomeValue, setIncomeValue] = useState(0);
   const [date, setDate] = useState("");
   const [dateValue, setDateValue] = useState(0);
-  const [category, setCategory] = useState("");
-  const [categoryId, setCategoryId] = useState(-1);
+
+  const [categories, setCategories] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("none");
+  const [categoryName, setCategoryName] = useState("");
 
   useEffect(() => {
     if (edit && income) {
@@ -43,7 +47,7 @@ const IncomeForm = () => {
       setIncomeValue(income.value);
       setDateValue(income.date);
       setDate(new Date(income.date).toLocaleDateString());
-      getCategory();
+      setSelectedCategory(income.categoryId);
     }
 
     if (edit) {
@@ -56,10 +60,6 @@ const IncomeForm = () => {
   useEffect(() => {
     useTitle(title);
   }, [title]);
-
-  useEffect(() => {
-    getCategoryId();
-  }, [category]);
 
   useEffect(() => {
     const [day, month, year] = date.split("/");
@@ -81,7 +81,68 @@ const IncomeForm = () => {
 
   useEffect(() => {
     getUser();
+    getCategories();
   }, []);
+
+  useEffect(() => {
+    const categoryOptionsAux = categories
+      .sort((categoryA, categoryB) => {
+        return categoryA.name > categoryB.name;
+      })
+      .map((category) => {
+        return (
+          <option key={category.id} value={category.id}>
+            {category.name}
+          </option>
+        );
+      });
+
+    setCategoryOptions(categoryOptionsAux);
+  }, [categories]);
+
+  const getCategories = async () => {
+    try {
+      const response = await request.get("/category/all");
+      if (response.status === 200) {
+        setCategories(response.data);
+      }
+    } catch (error) {}
+  };
+
+  const getCategoryId = async () => {
+    if (selectedCategory === "new") {
+      if (categoryName.length === 0) {
+        setErrorMessage("Por favor, selecione uma categoria.");
+        setError(true);
+        return -1;
+      }
+
+      try {
+        const response = await request.post("/category", {
+          name: categoryName,
+        });
+
+        if (response.status === 201) {
+          return response.data.id;
+        }
+      } catch (error) {
+        if (error.response.status === 409) {
+          setErrorMessage("Já exite uma categoria com o mesmo nome.");
+          setError(true);
+        } else {
+          setErrorMessage("Erro ao salvar categoria.");
+          setError(true);
+        }
+        return -1;
+      }
+    } else if (selectedCategory === "none") {
+      setErrorMessage("Por favor, selecione uma categoria.");
+      setError(true);
+      return -1;
+    } else {
+      return selectedCategory;
+    }
+  };
 
   const getIncome = async () => {
     try {
@@ -103,33 +164,6 @@ const IncomeForm = () => {
     }
   };
 
-  const getCategory = async () => {
-    try {
-      const response = await request.get(`/category/id/${income.categoryId}`);
-      setCategory(response.data.name);
-    } catch {}
-  };
-
-  const getCategoryId = async () => {
-    try {
-      const response = await request.get(`/category/name/${category}`);
-
-      if (response.status === 200) {
-        setCategoryId(response.data.id);
-      }
-    } catch (error) {
-      if (error.response.status === 404) {
-        try {
-          const response = await request.post("/category", { name: category });
-
-          if (response.status === 201) {
-            setCategoryId(response.data.id);
-          }
-        } catch {}
-      }
-    }
-  };
-
   const validateData = () => {
     if (isNaN(parseFloat(incomeValue))) {
       setErrorMessage("Valor inválido.");
@@ -143,30 +177,36 @@ const IncomeForm = () => {
   };
 
   const submitData = async () => {
-    await getCategoryId();
     validateData();
 
-    if (!hasError && categoryId != -1) {
-      const data = {
-        userId: user.id,
-        description: description,
-        value: parseFloat(incomeValue),
-        date: dateValue,
-        categoryId: categoryId,
-      };
+    if (hasError) {
+      return;
+    }
 
-      try {
-        const response = await (edit
-          ? request.put(`/income/${id}`, data)
-          : request.post("/income", data));
+    const categoryId = await getCategoryId();
+    if (categoryId === -1) {
+      return;
+    }
 
-        if (response.status === 200 || response.status === 201) {
-          navigate("/income");
-        }
-      } catch {
-        setErrorMessage("Erro ao salvar receita.");
-        setError(true);
+    const data = {
+      userId: user.id,
+      description: description,
+      value: parseFloat(incomeValue),
+      date: dateValue,
+      categoryId: categoryId,
+    };
+
+    try {
+      const response = await (edit
+        ? request.put(`/income/${id}`, data)
+        : request.post("/income", data));
+
+      if (response.status === 200 || response.status === 201) {
+        navigate("/income");
       }
+    } catch {
+      setErrorMessage("Erro ao salvar receita.");
+      setError(true);
     }
   };
 
@@ -224,14 +264,30 @@ const IncomeForm = () => {
             onChange={setDate}
             value={date}
           />
-          <TextInput
-            label="Categoria"
-            name="category"
-            type="text"
-            placeholder="Salário, venda, retorno de investimento..."
-            onChange={setCategory}
-            value={category}
-          />
+          <div className="inline-fields">
+            <Select
+              label="Categoria"
+              onChange={setSelectedCategory}
+              value={selectedCategory}
+            >
+              {selectedCategory === "none" && (
+                <option value="none" selected></option>
+              )}
+              <option value="new">Nova categoria</option>
+              <optgroup label="Categorias existentes">
+                {categoryOptions}
+              </optgroup>
+            </Select>
+            <TextInput
+              label="Nome da categoria"
+              name="category"
+              type="text"
+              placeholder="Nome da categoria"
+              onChange={setCategoryName}
+              value={categoryName}
+              disabled={selectedCategory !== "new"}
+            />
+          </div>
           <Submit value="Salvar" />
           {hasError && <span className="error-message">{errorMessage}</span>}
         </Form>

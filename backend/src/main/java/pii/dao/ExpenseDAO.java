@@ -162,7 +162,7 @@ public class ExpenseDAO {
 			insertExpense.setInt(6, expense.numberOfParcels());
 			insertExpense.setBoolean(7, expense.isPaid());
 			insertExpense.setLong(8, expense.cardId());
-			insertExpense.setLong(9, expense.dueDate());
+			insertExpense.setLong(9, expense.dueDateAsLong());
 			
 			insertExpense.executeUpdate();
 			
@@ -199,7 +199,7 @@ public class ExpenseDAO {
 			updateExpense.setInt(6, expense.numberOfParcels());
 			updateExpense.setBoolean(7, expense.isPaid());
 			updateExpense.setLong(8, expense.cardId());
-			updateExpense.setLong(9, expense.dueDate());
+			updateExpense.setLong(9, expense.dueDateAsLong());
 			updateExpense.setLong(10, id);
 			
 			updateExpense.executeUpdate();

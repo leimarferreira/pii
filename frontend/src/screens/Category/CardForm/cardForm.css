@@ -1,17 +1,17 @@
-.expense-form-screen {
+.card-form-screen {
   display: flex;
   justify-content: space-between;
   align-items: center;
   overflow-y: scroll;
 }
 
-.expense-menu {
+.card-menu {
   position: sticky;
   margin: 80px 0 auto 1%;
   height: 50vh;
 }
 
-.expense-form-container {
+.card-form-container {
   border-radius: 2%;
   width: 70%;
   padding: 2%;
@@ -21,11 +21,4 @@
 
 .error-message {
   color: #f00;
-}
-
-.inline-fields {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 49% 49%;
-  column-gap: 2%;
 }

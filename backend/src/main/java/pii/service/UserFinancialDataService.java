@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import pii.dto.UserFinancialData;
 import pii.enums.CardType;
+import pii.repository.ExpenseRepository;
 
 @Service
 public class UserFinancialDataService {
@@ -15,7 +16,7 @@ public class UserFinancialDataService {
 	@Autowired
 	private IncomeService incomeService;
 	@Autowired
-	private ExpenseService expenseService;
+	private ExpenseRepository expenseRepository;
 	@Autowired
 	private CardService cardService;
 
@@ -50,7 +51,7 @@ public class UserFinancialDataService {
 
 	private BigDecimal getTotalExpenses(long userId) {
 		BigDecimal total = new BigDecimal(0);
-		var expenses = expenseService.findAllByUserId(userId);
+		var expenses = expenseRepository.findAllByUserId(userId);
 		
 		for (var expense : expenses) {
 			total = total.add(expense.value());

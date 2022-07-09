@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import "./textInput.css";
 
 const TextInput = ({
+  disabled,
   name,
   placeholder,
   type,
@@ -51,11 +52,14 @@ const TextInput = ({
         </label>
       )}
       <div
-        className={`${className} form-field form-field-text-input`}
+        className={`${
+          disabled ? "disabled" : ""
+        } ${className}  form-field form-field-text-input`.trim()}
         onClick={onFieldClick}
       >
         {icon && <span className="form-field-left-icon">{icon}</span>}
         <input
+          disabled={disabled}
           min={min}
           type={type}
           name={name}

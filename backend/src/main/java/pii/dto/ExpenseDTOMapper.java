@@ -18,7 +18,7 @@ public class ExpenseDTOMapper {
 				expense.numberOfParcels(),
 				expense.isPaid(),
 				expense.cardId(),
-				expense.dueDate());
+				expense.dueDateAsLong());
 	}
 	
 	public Expense dtoToObj(ExpenseDTO dto) {

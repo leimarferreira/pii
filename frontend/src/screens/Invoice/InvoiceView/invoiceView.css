@@ -1,11 +1,11 @@
-.card-screen {
+.invoice-view-screen {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 100vh;
 }
 
-.card-menu {
+.invoice-view-menu {
   margin-left: 1%;
   height: 50vh;
 }
@@ -33,12 +33,4 @@
 
 .delete-button {
   background-color: #ff3e3e;
-}
-
-.invoice-button {
-  background-color: #3e3eff;
-}
-
-.card-opt-menu {
-  height: fit-content;
 }
