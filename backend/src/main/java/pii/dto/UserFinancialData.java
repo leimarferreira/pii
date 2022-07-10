@@ -4,8 +4,11 @@ import java.math.BigDecimal;
 
 public record UserFinancialData (
 	long userId,
+	BigDecimal creditExpenses,
+	BigDecimal debitExpenses,
+	BigDecimal moneyExpenses,
 	BigDecimal totalExpenses,
 	BigDecimal totalIncomes,
-	BigDecimal totalCards,
+	BigDecimal totalCredit,
 	BigDecimal balance
 ) {}

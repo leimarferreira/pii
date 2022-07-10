@@ -57,6 +57,8 @@ const Expense = () => {
           })
         );
         setExpenses(expensesAux);
+      } else if (status === 204) {
+        setExpenses([]);
       }
     } catch (error) {}
   };

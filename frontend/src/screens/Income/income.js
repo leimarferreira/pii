@@ -52,6 +52,8 @@ const Income = () => {
         );
 
         setIncomes(incomesAux);
+      } else if (status === 204) {
+        setIncomes([]);
       }
     } catch (error) {}
   };

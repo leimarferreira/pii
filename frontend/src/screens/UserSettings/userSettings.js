@@ -127,6 +127,7 @@ const UserSettings = () => {
       };
 
       await authService.login(credentials);
+      window.location.reload();
     } catch {
       setErrorMessage("Erro ao salvar usuário.");
       setError(true);

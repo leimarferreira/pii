@@ -52,8 +52,10 @@ const CardForm = () => {
   }, [title]);
 
   useEffect(() => {
-    getCard();
-  }, [id]);
+    if (edit) {
+      getCard();
+    }
+  }, [id, edit]);
 
   useEffect(() => {
     if (/\/card\/edit\/.*/g.test(pathname)) {
@@ -62,16 +64,20 @@ const CardForm = () => {
   }, []);
 
   useEffect(() => {
-    getUser();
+    getUser()
+      .then(getCard)
+      .catch(() => {});
   }, []);
 
   const getCard = async () => {
-    try {
-      const { data } = await request.get(`/card/id/${id}`);
-      setCard(data);
-    } catch {
-      setErrorMessage("Ocorreu um erro durante a comunicação.");
-      setError(true);
+    if (edit) {
+      try {
+        const { data } = await request.get(`/card/id/${id}`);
+        setCard(data);
+      } catch {
+        setErrorMessage("Ocorreu um erro durante a comunicação.");
+        setError(true);
+      }
     }
   };
 
