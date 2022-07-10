@@ -1,16 +1,10 @@
 /* eslint-disable no-empty */
-import {
-  faCreditCard,
-  faGear,
-  faMoneyBillTrendUp,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/Button/button";
-import Menu from "components/Menu/menu";
-import MenuItem from "components/Menu/MenuItem/menuItem";
+import GlobalMenu from "components/GlobalMenu/globalMenu";
 import FilterOption from "components/OptionsMenu/FilterOption/filterOption";
 import OptionsMenu from "components/OptionsMenu/optionsMenu";
 import Table from "components/Table/table";
+import TableHeader from "components/Table/TableHeader/tableHeader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import request from "services/request";
@@ -31,6 +25,8 @@ const Card = () => {
   const [numberFilter, setNumberFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState(0);
   const [dueDateFilter, setDueDateFilter] = useState(0);
+
+  const [sortBy, setSortBy] = useState("none");
 
   const navigate = useNavigate();
 
@@ -56,7 +52,8 @@ const Card = () => {
   };
 
   useEffect(() => {
-    const rows = filteredCards.map((card) => {
+    const sortedCards = sort(filteredCards);
+    const rows = sortedCards.map((card) => {
       return (
         <tr
           key={card.id}
@@ -74,16 +71,18 @@ const Card = () => {
           <td>{cardTypes[card.type]}</td>
           <td>{card.brand}</td>
           <td>
-            {card.type === 1 ? card.limit : userFinancialData.totalIncomes}
+            {card.type === 1
+              ? card.limit.toFixed(2)
+              : userFinancialData.totalIncomes.toFixed(2)}
           </td>
-          <td>{card.type === 1 ? card.currentValue : "-"}</td>
+          <td>{card.type === 1 ? card.currentValue.toFixed(2) : "-"}</td>
           <td>{card.type === 1 ? card.dueDate : "-"}</td>
         </tr>
       );
     });
 
     setTableRows(rows);
-  }, [filteredCards, selected]);
+  }, [filteredCards, selected, sortBy]);
 
   useEffect(() => {
     setFilteredCards(cards);
@@ -107,6 +106,104 @@ const Card = () => {
         .catch(() => {});
     }
   }, [user]);
+
+  const sort = (input) => {
+    if (sortBy === "none") {
+      return input;
+    } else if (sortBy === "number") {
+      return sortByNumber(input);
+    } else if (sortBy === "type") {
+      return sortByType(input);
+    } else if (sortBy === "brand") {
+      return sortByBrand(input);
+    } else if (sortBy === "limit") {
+      return sortByLimit(input);
+    } else if (sortBy === "value") {
+      return sortByValue(input);
+    } else if (sortBy === "due-date") {
+      return sortByDueDay(input);
+    }
+  };
+
+  const sortByNumber = (input) => {
+    let data = input;
+
+    data.sort((cardA, cardB) => {
+      if (cardA.number > cardB.number) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return data;
+  };
+
+  const sortByType = (input) => {
+    let data = input;
+
+    data.sort((cardA, cardB) => {
+      return cardA.type - cardB.type;
+    });
+
+    return data;
+  };
+
+  const sortByBrand = (input) => {
+    let data = input;
+
+    data.sort((cardA, cardB) => {
+      if (cardA.brand > cardB.brand) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return data;
+  };
+
+  const sortByLimit = (input) => {
+    let data = input;
+
+    data.sort((cardA, cardB) => {
+      return cardA.limit - cardB.limit;
+    });
+
+    return data;
+  };
+
+  const sortByValue = (input) => {
+    let data = input;
+
+    data.sort((cardA, cardB) => {
+      if (cardA.type === 2 && cardB.type === 1) {
+        return 1;
+      } else if (cardB.type === 2 && cardA.type === 1) {
+        return -1;
+      }
+
+      return cardA.currentValue - cardB.currentValue;
+    });
+
+    return data;
+  };
+
+  const sortByDueDay = (input) => {
+    let data = input;
+
+    data.sort((cardA, cardB) => {
+      if (cardA.type === 2 && cardB.type === 1) {
+        return 1;
+      } else if (cardB.type === 2 && cardA.type === 1) {
+        return -1;
+      }
+
+      return cardA.dueDate - cardB.dueDate;
+    });
+
+    return data;
+  };
 
   const filter = () => {
     let cardsAux = cards;
@@ -148,32 +245,7 @@ const Card = () => {
 
   return (
     <div className="card-screen">
-      <Menu direction="vertical" className="card-menu">
-        <MenuItem
-          title="Cartão"
-          onClick={() => navigate("/card")}
-          icon={<FontAwesomeIcon icon={faCreditCard} />}
-        />
-        <MenuItem
-          title="Receita"
-          onClick={() => navigate("/income")}
-          icon={<FontAwesomeIcon icon={faMoneyBillTrendUp} />}
-        />
-        <MenuItem
-          title="Despesa"
-          onClick={() => navigate("/expense")}
-          icon={
-            <span className="icon-expense">
-              <FontAwesomeIcon icon={faMoneyBillTrendUp} />
-            </span>
-          }
-        />
-        <MenuItem
-          title="Ajuste"
-          onClick={() => navigate("/settings")}
-          icon={<FontAwesomeIcon icon={faGear} />}
-        />
-      </Menu>
+      <GlobalMenu direction="vertical" className="card-menu" />
 
       <div className="main-content">
         <OptionsMenu
@@ -251,16 +323,34 @@ const Card = () => {
           }
         />
         <Table title="Cartões">
-          <thead>
-            <tr>
-              <th>Número</th>
-              <th>Tipo</th>
-              <th>Bandeira</th>
-              <th>Limite (R$)</th>
-              <th>Valor atual (R$)</th>
-              <th>Dia do fechamento</th>
-            </tr>
-          </thead>
+          <TableHeader
+            itens={[
+              {
+                label: "Número",
+                onClick: () => setSortBy("number"),
+              },
+              {
+                label: "Tipo",
+                onClick: () => setSortBy("type"),
+              },
+              {
+                label: "Bandeira",
+                onClick: () => setSortBy("brand"),
+              },
+              {
+                label: "Limite (R$)",
+                onClick: () => setSortBy("limit"),
+              },
+              {
+                label: "Valor atual (R$)",
+                onClick: () => setSortBy("value"),
+              },
+              {
+                label: "Dia do fechamento",
+                onClick: () => setSortBy("due-date"),
+              },
+            ]}
+          />
           <tbody>{tableRows}</tbody>
         </Table>
       </div>

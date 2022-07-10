@@ -1,14 +1,7 @@
 /* eslint-disable no-empty */
-import {
-  faCreditCard,
-  faGear,
-  faMoneyBillTrendUp,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Select from "components/Form/Field/Select/select";
 import Form, { Submit, TextInput } from "components/Form/form";
-import Menu from "components/Menu/menu";
-import MenuItem from "components/Menu/MenuItem/menuItem";
+import GlobalMenu from "components/GlobalMenu/globalMenu";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import request from "services/request";
@@ -212,32 +205,7 @@ const IncomeForm = () => {
 
   return (
     <div className="income-form-screen">
-      <Menu direction="vertical" className="income-menu">
-        <MenuItem
-          title="Cartão"
-          onClick={() => navigate("/card")}
-          icon={<FontAwesomeIcon icon={faCreditCard} />}
-        />
-        <MenuItem
-          title="Receita"
-          onClick={() => navigate("/income")}
-          icon={<FontAwesomeIcon icon={faMoneyBillTrendUp} />}
-        />
-        <MenuItem
-          title="Despesa"
-          onClick={() => navigate("/expense")}
-          icon={
-            <span className="icon-expense">
-              <FontAwesomeIcon icon={faMoneyBillTrendUp} />
-            </span>
-          }
-        />
-        <MenuItem
-          title="Ajuste"
-          onClick={() => navigate("/settings")}
-          icon={<FontAwesomeIcon icon={faGear} />}
-        />
-      </Menu>
+      <GlobalMenu direction="vertical" className="income-menu" />
       <div className="income-form-container">
         <Form className="income-form" title={title} onSubmit={submitData}>
           <TextInput

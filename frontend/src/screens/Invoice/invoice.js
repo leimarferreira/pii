@@ -1,13 +1,6 @@
 /* eslint-disable no-empty */
-import {
-  faCreditCard,
-  faGear,
-  faMoneyBillTrendUp,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/Button/button";
-import Menu from "components/Menu/menu";
-import MenuItem from "components/Menu/MenuItem/menuItem";
+import GlobalMenu from "components/GlobalMenu/globalMenu";
 import FilterOption from "components/OptionsMenu/FilterOption/filterOption";
 import OptionsMenu from "components/OptionsMenu/optionsMenu";
 import Table from "components/Table/table";
@@ -38,7 +31,8 @@ const Invoice = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const rows = filteredInvoices.map((invoice) => {
+    const sortedRows = sort(filteredInvoices);
+    const rows = sortedRows.map((invoice) => {
       return (
         <tr
           key={invoice.id}
@@ -53,7 +47,7 @@ const Invoice = () => {
           className={selected.id === invoice.id ? "selected" : ""}
         >
           <td>{invoice.month}</td>
-          <td>{invoice.value}</td>
+          <td>{invoice.value.toFixed(2)}</td>
         </tr>
       );
     });
@@ -87,10 +81,22 @@ const Invoice = () => {
     }
   };
 
-  const sortByMonth = () => {
-    let sorted = filteredInvoices;
+  const sort = (input) => {
+    if (sortBy === "none") {
+      return input;
+    } else if (sortBy === "month") {
+      return sortByMonth(input);
+    } else if (sortBy === "value") {
+      return sortByValue(input);
+    }
 
-    sorted.sort((invoiceA, invoiceB) => {
+    return input;
+  };
+
+  const sortByMonth = (input) => {
+    let data = input;
+
+    data.sort((invoiceA, invoiceB) => {
       const [monthA, yearA] = invoiceA.month.split("/");
       const [monthB, yearB] = invoiceB.month.split("/");
 
@@ -103,19 +109,17 @@ const Invoice = () => {
       return parseInt(monthA) - parseInt(monthB);
     });
 
-    setFilteredInvoices(sorted);
-    setSortBy("month");
+    return data;
   };
 
-  const sortByValue = () => {
-    let sorted = filteredInvoices;
+  const sortByValue = (input) => {
+    let data = input;
 
-    sorted.sort((invoiceA, invoiceB) => {
+    data.sort((invoiceA, invoiceB) => {
       return invoiceA.value - invoiceB.value;
     });
 
-    setFilteredInvoices(sorted);
-    setSortBy("value");
+    return data;
   };
 
   const filter = () => {
@@ -144,32 +148,7 @@ const Invoice = () => {
 
   return (
     <div className="invoice-screen">
-      <Menu direction="vertical" className="invoice-menu">
-        <MenuItem
-          title="Cartão"
-          onClick={() => navigate("/card")}
-          icon={<FontAwesomeIcon icon={faCreditCard} />}
-        />
-        <MenuItem
-          title="Receita"
-          onClick={() => navigate("/income")}
-          icon={<FontAwesomeIcon icon={faMoneyBillTrendUp} />}
-        />
-        <MenuItem
-          title="Despesa"
-          onClick={() => navigate("/expense")}
-          icon={
-            <span className="icon-expense">
-              <FontAwesomeIcon icon={faMoneyBillTrendUp} />
-            </span>
-          }
-        />
-        <MenuItem
-          title="Ajuste"
-          onClick={() => navigate("/settings")}
-          icon={<FontAwesomeIcon icon={faGear} />}
-        />
-      </Menu>
+      <GlobalMenu direction="vertical" className="invoice-menu" />
 
       <div className="main-content">
         <OptionsMenu
@@ -203,11 +182,11 @@ const Invoice = () => {
             itens={[
               {
                 label: "Mês",
-                onClick: sortByMonth,
+                onClick: () => setSortBy("month"),
               },
               {
-                label: "Valor",
-                onClick: sortByValue,
+                label: "Valor (R$)",
+                onClick: () => setSortBy("value"),
               },
             ]}
           />

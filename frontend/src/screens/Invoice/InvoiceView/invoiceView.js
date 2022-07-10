@@ -1,19 +1,12 @@
 /* eslint-disable no-empty */
-import {
-  faCreditCard,
-  faGear,
-  faMoneyBillTrendUp,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/Button/button";
-import Menu from "components/Menu/menu";
-import MenuItem from "components/Menu/MenuItem/menuItem";
+import GlobalMenu from "components/GlobalMenu/globalMenu";
 import FilterOption from "components/OptionsMenu/FilterOption/filterOption";
 import OptionsMenu from "components/OptionsMenu/optionsMenu";
 import Table from "components/Table/table";
 import TableHeader from "components/Table/TableHeader/tableHeader";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import request from "services/request";
 import useTitle from "utils/hooks/useTitle";
 import "./invoiceView.css";
@@ -32,13 +25,14 @@ const InvoiceView = () => {
   const [dateFilter, setDateFilter] = useState("");
   const [valueFilter, setValueFilter] = useState("");
 
+  const [sortBy, setSortBy] = useState("none");
+
   const [errorMessage, setErrorMessage] = useState("");
   const [hasError, setError] = useState(false);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-    const rows = filteredParcels.map((parcel) => {
+    const sortedParcels = sort(filteredParcels);
+    const rows = sortedParcels.map((parcel) => {
       return (
         <tr
           key={parcel.id}
@@ -56,13 +50,13 @@ const InvoiceView = () => {
           <td>{parcel.parcelNumber}</td>
           <td>{parcel.numberOfParcels}</td>
           <td>{new Date(parcel.dueDate * 1000)?.toLocaleDateString()}</td>
-          <td>{parcel.value}</td>
+          <td>{parcel.value.toFixed(2)}</td>
         </tr>
       );
     });
 
     setTableRows(rows);
-  }, [filteredParcels, selected]);
+  }, [filteredParcels, selected, sortBy]);
 
   useEffect(() => {
     filter();
@@ -88,6 +82,78 @@ const InvoiceView = () => {
         setError(true);
       }
     }
+  };
+
+  const sort = (input) => {
+    if (sortBy === "none") {
+      return input;
+    } else if (sortBy === "description") {
+      return sortByDescription(input);
+    } else if (sortBy === "parcel-number") {
+      return sortByParcelNumber(input);
+    } else if (sortBy === "total-parcels") {
+      return sortByTotalParcels(input);
+    } else if (sortBy === "due-date") {
+      return sortByDueDate(input);
+    } else if (sortBy === "value") {
+      return sortByValue(input);
+    }
+
+    return input;
+  };
+
+  const sortByDescription = (input) => {
+    let data = input;
+
+    data.sort((parcelA, parcelB) => {
+      if (parcelA.description > parcelB.description) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return data;
+  };
+
+  const sortByParcelNumber = (input) => {
+    let data = input;
+
+    data.sort((parcelA, parcelB) => {
+      return parcelA.parcelNumber - parcelB.parcelNumber;
+    });
+
+    return data;
+  };
+
+  const sortByTotalParcels = (input) => {
+    let data = input;
+
+    data.sort((parcelA, parcelB) => {
+      return parcelA.numberOfParcels - parcelB.numberOfParcels;
+    });
+
+    return data;
+  };
+
+  const sortByDueDate = (input) => {
+    let data = input;
+
+    data.sort((parcelA, parcelB) => {
+      return parcelA.dueDate - parcelB.dueDate;
+    });
+
+    return data;
+  };
+
+  const sortByValue = (input) => {
+    let data = input;
+
+    data.sort((parcelA, parcelB) => {
+      return parcelA.value - parcelB.value;
+    });
+
+    return data;
   };
 
   const filter = () => {
@@ -124,32 +190,7 @@ const InvoiceView = () => {
 
   return (
     <div className="invoice-view-screen">
-      <Menu direction="vertical" className="invoice-view-menu">
-        <MenuItem
-          title="Cartão"
-          onClick={() => navigate("/card")}
-          icon={<FontAwesomeIcon icon={faCreditCard} />}
-        />
-        <MenuItem
-          title="Receita"
-          onClick={() => navigate("/income")}
-          icon={<FontAwesomeIcon icon={faMoneyBillTrendUp} />}
-        />
-        <MenuItem
-          title="Despesa"
-          onClick={() => navigate("/expense")}
-          icon={
-            <span className="icon-expense">
-              <FontAwesomeIcon icon={faMoneyBillTrendUp} />
-            </span>
-          }
-        />
-        <MenuItem
-          title="Ajuste"
-          onClick={() => navigate("/settings")}
-          icon={<FontAwesomeIcon icon={faGear} />}
-        />
-      </Menu>
+      <GlobalMenu direction="vertical" className="invoice-view-menu" />
 
       <div className="main-content">
         <OptionsMenu
@@ -181,18 +222,23 @@ const InvoiceView = () => {
             itens={[
               {
                 label: "Descrição",
+                onClick: () => setSortBy("description"),
               },
               {
                 label: "Número da parcela",
+                onClick: () => setSortBy("parcel-number"),
               },
               {
                 label: "Total de parcelas",
+                onClick: () => setSortBy("total-parcels"),
               },
               {
                 label: "Data de vencimento",
+                onClick: () => setSortBy("due-date"),
               },
               {
-                label: "Valor",
+                label: "Valor (R$)",
+                onClick: () => setSortBy("value"),
               },
             ]}
           />

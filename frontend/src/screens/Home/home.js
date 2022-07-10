@@ -1,23 +1,13 @@
 /* eslint-disable no-empty */
-import {
-  faCreditCard,
-  faGear,
-  faList,
-  faMoneyBillTrendUp,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Menu from "components/Menu/menu";
-import MenuItem from "components/Menu/MenuItem/menuItem";
+import GlobalMenu from "components/GlobalMenu/globalMenu";
 import Table from "components/Table/table";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import request from "services/request";
 import useTitle from "utils/hooks/useTitle";
 import "./home.css";
 
 const Home = () => {
   useTitle("Início");
-  const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
   const [userFinancialData, setUserFinancialData] = useState(null);
@@ -70,37 +60,7 @@ const Home = () => {
 
   return (
     <div className="home-screen">
-      <Menu className="home-menu">
-        <MenuItem
-          title="Cartão"
-          onClick={() => navigate("/card")}
-          icon={<FontAwesomeIcon icon={faCreditCard} />}
-        />
-        <MenuItem
-          title="Receita"
-          onClick={() => navigate("/income")}
-          icon={<FontAwesomeIcon icon={faMoneyBillTrendUp} />}
-        />
-        <MenuItem
-          title="Despesa"
-          onClick={() => navigate("/expense")}
-          icon={
-            <span className="icon-expense">
-              <FontAwesomeIcon icon={faMoneyBillTrendUp} />
-            </span>
-          }
-        />
-        <MenuItem
-          title="Categorias"
-          onClick={() => navigate("/category")}
-          icon={<FontAwesomeIcon icon={faList} />}
-        />
-        <MenuItem
-          title="Ajuste"
-          onClick={() => navigate("/settings")}
-          icon={<FontAwesomeIcon icon={faGear} />}
-        />
-      </Menu>
+      <GlobalMenu direction="horizontal" className="home-menu" />
       <Table title="Dados do usuário" className="home-table">
         <thead>
           <tr>
