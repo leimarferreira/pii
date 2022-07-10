@@ -1,20 +1,13 @@
 /* eslint-disable no-empty */
-import {
-  faCreditCard,
-  faGear,
-  faMoneyBillTrendUp,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/Button/button";
 import { TextInput } from "components/Form/form";
-import Menu from "components/Menu/menu";
-import MenuItem from "components/Menu/MenuItem/menuItem";
+import GlobalMenu from "components/GlobalMenu/globalMenu";
 import Modal from "components/Modal/modal";
 import FilterOption from "components/OptionsMenu/FilterOption/filterOption";
 import OptionsMenu from "components/OptionsMenu/optionsMenu";
 import Table from "components/Table/table";
+import TableHeader from "components/Table/TableHeader/tableHeader";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import request from "services/request";
 import useTitle from "utils/hooks/useTitle";
 import "./category.css";
@@ -34,7 +27,7 @@ const Category = () => {
   const [isAddModalVisible, setAddModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(true);
 
-  const navigate = useNavigate();
+  const [sortBy, setSortBy] = useState("none");
 
   useEffect(() => {
     getCategories();
@@ -45,7 +38,8 @@ const Category = () => {
   }, [categories]);
 
   useEffect(() => {
-    const rows = filteredCategories.map((category) => {
+    const sortedCategories = sort(filteredCategories);
+    const rows = sortedCategories.map((category) => {
       return (
         <tr
           key={category.id}
@@ -64,7 +58,7 @@ const Category = () => {
     });
 
     setTableRows(rows);
-  }, [filteredCategories, selected]);
+  }, [filteredCategories, selected, sortBy]);
 
   const getCategories = async () => {
     try {
@@ -84,6 +78,28 @@ const Category = () => {
         await getCategories();
       } catch {}
     }
+  };
+
+  const sort = (input) => {
+    if (sortBy === "none") {
+      return input;
+    } else if (sortBy === "name") {
+      return sortByName(input);
+    }
+  };
+
+  const sortByName = (input) => {
+    let data = input;
+
+    data.sort((categoryA, categoryB) => {
+      if (categoryA.name > categoryB.name) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return data;
   };
 
   const filter = () => {
@@ -142,33 +158,7 @@ const Category = () => {
 
   return (
     <div className="category-screen">
-      <Menu direction="vertical" className="category-menu">
-        <MenuItem
-          title="Cartão"
-          onClick={() => navigate("/card")}
-          icon={<FontAwesomeIcon icon={faCreditCard} />}
-        />
-        <MenuItem
-          title="Receita"
-          onClick={() => navigate("/income")}
-          icon={<FontAwesomeIcon icon={faMoneyBillTrendUp} />}
-        />
-        <MenuItem
-          title="Despesa"
-          onClick={() => navigate("/expense")}
-          icon={
-            <span className="icon-expense">
-              <FontAwesomeIcon icon={faMoneyBillTrendUp} />
-            </span>
-          }
-        />
-        <MenuItem
-          title="Ajuste"
-          onClick={() => navigate("/settings")}
-          icon={<FontAwesomeIcon icon={faGear} />}
-        />
-      </Menu>
-
+      <GlobalMenu direction="vertical" className="category-menu" />
       <div className="main-content">
         <OptionsMenu
           filterOptions={
@@ -198,11 +188,14 @@ const Category = () => {
           }
         />
         <Table title="Categorias">
-          <thead>
-            <tr>
-              <th>Nome</th>
-            </tr>
-          </thead>
+          <TableHeader
+            itens={[
+              {
+                label: "Nome",
+                onClick: () => setSortBy("name"),
+              },
+            ]}
+          />
           <tbody>{tableRows}</tbody>
         </Table>
         <Modal

@@ -1,16 +1,10 @@
 /* eslint-disable no-empty */
-import {
-  faCreditCard,
-  faGear,
-  faMoneyBillTrendUp,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/Button/button";
-import Menu from "components/Menu/menu";
-import MenuItem from "components/Menu/MenuItem/menuItem";
+import GlobalMenu from "components/GlobalMenu/globalMenu";
 import FilterOption from "components/OptionsMenu/FilterOption/filterOption";
 import OptionsMenu from "components/OptionsMenu/optionsMenu";
 import Table from "components/Table/table";
+import TableHeader from "components/Table/TableHeader/tableHeader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import request from "services/request";
@@ -25,13 +19,13 @@ const Income = () => {
   const [filteredIncomes, setFilteredIncomes] = useState([]);
   const [tableRows, setTableRows] = useState([]);
   const [selected, setSelected] = useState([]);
-  const [categories, setCategories] = useState({});
-  const [dates, setDates] = useState({});
 
   const [descriptionFilter, setDescriptionFilter] = useState("");
   const [valueFilter, setValueFilter] = useState(0);
   const [dateFilter, setDateFilter] = useState("");
   const [categoryFilter, setCategororyFilter] = useState("");
+
+  const [sortBy, setSortBy] = useState("none");
 
   const navigate = useNavigate();
 
@@ -44,42 +38,39 @@ const Income = () => {
 
   const getIncomes = async () => {
     try {
-      const response = await request.get(`/income/all/user/${user.id}`);
-      if (response.status === 200) {
-        setIncomes(response.data);
+      const { status, data } = await request.get(`/income/all/user/${user.id}`);
+      if (status === 200) {
+        let incomesAux = await Promise.all(
+          data.map(async (item) => {
+            const category = await getCategory(item.categoryId);
+
+            return {
+              ...item,
+              categoryName: category.name,
+            };
+          })
+        );
+
+        setIncomes(incomesAux);
       }
     } catch (error) {}
   };
 
-  const getCategories = async (ids) => {
-    let categoriesAux = {};
+  const getCategory = async (id) => {
+    try {
+      const response = await request.get(`/category/id/${id}`);
 
-    ids.forEach(async (id) => {
-      try {
-        const response = await request.get(`/category/id/${id}`);
-        if (response.status === 200) {
-          categoriesAux[id] = response.data;
-          setCategories(categoriesAux);
-        }
-      } catch (error) {}
-    });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      return null;
+    }
   };
 
   useEffect(() => {
-    const ids = new Set(incomes.map((income) => income.categoryId));
-    getCategories(ids);
-
-    let datesAux = {};
-
-    incomes.forEach((income) => {
-      datesAux[income.id] = new Date(income.date).toLocaleDateString();
-    });
-
-    setDates(datesAux);
-  }, [incomes]);
-
-  useEffect(() => {
-    const rows = filteredIncomes.map((income) => {
+    const sortedIncomes = sort(filteredIncomes);
+    const rows = sortedIncomes.map((income) => {
       return (
         <tr
           key={income.id}
@@ -94,15 +85,15 @@ const Income = () => {
           className={selected.id === income.id ? "selected" : ""}
         >
           <td>{income.description}</td>
-          <td>{income.value}</td>
-          <td>{dates[income.id]}</td>
-          <td>{categories[income.categoryId]?.name}</td>
+          <td>{income.value.toFixed(2)}</td>
+          <td>{new Date(income.date).toLocaleDateString()}</td>
+          <td>{income?.categoryName}</td>
         </tr>
       );
     });
 
     setTableRows(rows);
-  }, [filteredIncomes, selected, categories, dates]);
+  }, [filteredIncomes, selected, sortBy]);
 
   useEffect(() => {
     filter();
@@ -117,6 +108,70 @@ const Income = () => {
   useEffect(() => {
     getUser();
   }, []);
+
+  const sort = (input) => {
+    if (sortBy === "none") {
+      return input;
+    } else if (sortBy === "description") {
+      return sortByDescription(input);
+    } else if (sortBy === "value") {
+      return sortByValue(input);
+    } else if (sortBy === "date") {
+      return sortByDate(input);
+    } else if (sortBy === "category") {
+      return sortByCategory(input);
+    }
+  };
+
+  const sortByDescription = (input) => {
+    let data = input;
+
+    data.sort((incomeA, incomeB) => {
+      if (incomeA.description > incomeB.description) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return data;
+  };
+
+  const sortByValue = (input) => {
+    let data = input;
+
+    data.sort((incomeA, incomeB) => {
+      return incomeA.value - incomeB.value;
+    });
+
+    return data;
+  };
+
+  const sortByDate = (input) => {
+    let data = input;
+
+    data.sort((incomeA, incomeB) => {
+      return incomeA.date - incomeB.date;
+    });
+
+    return data;
+  };
+
+  const sortByCategory = (input) => {
+    let data = input;
+
+    data.sort((incomeA, incomeB) => {
+      if (
+        incomeA.categoryName.toLowerCase() > incomeB.categoryName.toLowerCase()
+      ) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return data;
+  };
 
   const filter = () => {
     let incomesAux = incomes;
@@ -135,15 +190,13 @@ const Income = () => {
 
     if (dateFilter.length !== 0) {
       incomesAux = incomesAux.filter((income) => {
-        return dateFilter === dates[income.id];
+        return dateFilter === new Date(income.date).toLocaleDateString();
       });
     }
 
     if (categoryFilter.length !== 0) {
       incomesAux = incomesAux.filter((income) => {
-        return new RegExp(categoryFilter, "gi").test(
-          categories[income.categoryId].name
-        );
+        return new RegExp(categoryFilter, "gi").test(income.categoryName);
       });
     }
 
@@ -161,32 +214,7 @@ const Income = () => {
 
   return (
     <div className="income-screen">
-      <Menu direction="vertical" className="income-menu">
-        <MenuItem
-          title="Cartão"
-          onClick={() => navigate("/card")}
-          icon={<FontAwesomeIcon icon={faCreditCard} />}
-        />
-        <MenuItem
-          title="Receita"
-          onClick={() => navigate("/income")}
-          icon={<FontAwesomeIcon icon={faMoneyBillTrendUp} />}
-        />
-        <MenuItem
-          title="Despesa"
-          onClick={() => navigate("/expense")}
-          icon={
-            <span className="icon-expense">
-              <FontAwesomeIcon icon={faMoneyBillTrendUp} />
-            </span>
-          }
-        />
-        <MenuItem
-          title="Ajuste"
-          onClick={() => navigate("/settings")}
-          icon={<FontAwesomeIcon icon={faGear} />}
-        />
-      </Menu>
+      <GlobalMenu direction="vertical" className="income-menu" />
 
       <div className="main-content">
         <OptionsMenu
@@ -238,14 +266,26 @@ const Income = () => {
           }
         />
         <Table title="Receitas">
-          <thead>
-            <tr>
-              <th>Descrição</th>
-              <th>Valor (R$)</th>
-              <th>Data</th>
-              <th>Categoria</th>
-            </tr>
-          </thead>
+          <TableHeader
+            itens={[
+              {
+                label: "Descrição",
+                onClick: () => setSortBy("description"),
+              },
+              {
+                label: "Valor (R$)",
+                onClick: () => setSortBy("value"),
+              },
+              {
+                label: "Data",
+                onClick: () => setSortBy("date"),
+              },
+              {
+                label: "Categoria",
+                onClick: () => setSortBy("category"),
+              },
+            ]}
+          />
           <tbody>{tableRows}</tbody>
         </Table>
       </div>

@@ -1,16 +1,10 @@
 /* eslint-disable no-empty */
-import {
-  faCreditCard,
-  faGear,
-  faMoneyBillTrendUp,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/Button/button";
-import Menu from "components/Menu/menu";
-import MenuItem from "components/Menu/MenuItem/menuItem";
+import GlobalMenu from "components/GlobalMenu/globalMenu";
 import FilterOption from "components/OptionsMenu/FilterOption/filterOption";
 import OptionsMenu from "components/OptionsMenu/optionsMenu";
 import Table from "components/Table/table";
+import TableHeader from "components/Table/TableHeader/tableHeader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import request from "services/request";
@@ -25,13 +19,13 @@ const Expense = () => {
   const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [tableRows, setTableRows] = useState([]);
   const [selected, setSelected] = useState([]);
-  const [categories, setCategories] = useState({});
-  const [dates, setDates] = useState({});
 
   const [paidFilter, setPaidFilter] = useState(-1);
   const [dateFilter, setDateFilter] = useState("");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState(0);
   const [numberOfParcelsFilter, setNumberOfParcelsFilter] = useState("");
+
+  const [sortBy, setSortBy] = useState("none");
 
   const paymentMethods = {
     1: "Crédito",
@@ -50,44 +44,38 @@ const Expense = () => {
 
   const getExpenses = async () => {
     try {
-      const response = await request.get(`/expense/user/${user.id}`);
-      if (response.status === 200) {
-        setExpenses(response.data);
+      const { status, data } = await request.get(`/expense/user/${user.id}`);
+      if (status === 200) {
+        let expensesAux = await Promise.all(
+          data.map(async (item) => {
+            const category = await getCategory(item.categoryId);
+
+            return {
+              ...item,
+              categoryName: category.name,
+            };
+          })
+        );
+        setExpenses(expensesAux);
       }
     } catch (error) {}
   };
 
-  const getCategories = async (ids) => {
-    let categoriesAux = {};
+  const getCategory = async (id) => {
+    try {
+      const response = await request.get(`/category/id/${id}`);
 
-    ids.forEach(async (id) => {
-      try {
-        const response = await request.get(`/category/id/${id}`);
-        if (response.status === 200) {
-          categoriesAux[id] = response.data;
-          setCategories(categoriesAux);
-        }
-      } catch (error) {}
-    });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      return null;
+    }
   };
 
   useEffect(() => {
-    const ids = new Set(expenses.map((expense) => expense.categoryId));
-    getCategories(ids);
-
-    let datesAux = {};
-
-    expenses.forEach((expense) => {
-      datesAux[expense.id] = new Date(
-        expense.dueDate * 1000
-      ).toLocaleDateString();
-    });
-
-    setDates(datesAux);
-  }, [expenses]);
-
-  useEffect(() => {
-    const rows = filteredExpenses.map((expense) => {
+    const sortedExpenses = sort(filteredExpenses);
+    const rows = sortedExpenses.map((expense) => {
       return (
         <tr
           key={expense.id}
@@ -102,18 +90,18 @@ const Expense = () => {
           className={selected.id === expense.id ? "selected" : ""}
         >
           <td>{expense.description}</td>
-          <td>{categories[expense.categoryId]?.name}</td>
+          <td>{expense.categoryName}</td>
           <td>{expense.value}</td>
           <td>{paymentMethods[expense.paymentMethod]}</td>
           <td>{expense.numberOfParcels}</td>
           <td>{expense.isPaid ? "Sim" : "Não"}</td>
-          <td>{dates[expense.id]}</td>
+          <td>{new Date(expense.dueDate * 1000).toLocaleDateString()}</td>
         </tr>
       );
     });
 
     setTableRows(rows);
-  }, [filteredExpenses, selected, categories, dates]);
+  }, [filteredExpenses, selected, sortBy]);
 
   useEffect(() => {
     filter();
@@ -129,6 +117,112 @@ const Expense = () => {
     getUser();
   }, []);
 
+  const sort = (input) => {
+    if (sortBy === "none") {
+      return input;
+    } else if (sortBy === "description") {
+      return sortByDescription(input);
+    } else if (sortBy === "category") {
+      return sortByCategory(input);
+    } else if (sortBy === "value") {
+      return sortByValue(input);
+    } else if (sortBy === "payment-method") {
+      return sortByPaymentMethod(input);
+    } else if (sortBy === "number-of-parcels") {
+      return sortByNumberOfParcels(input);
+    } else if (sortBy === "is-paid") {
+      return sortByPaid(input);
+    } else if (sortBy === "due-date") {
+      return sortByDueDate(input);
+    }
+  };
+
+  const sortByDescription = (input) => {
+    let data = input;
+
+    data.sort((expenseA, expenseB) => {
+      if (expenseA.description > expenseB.description) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return data;
+  };
+  const sortByCategory = (input) => {
+    let data = input;
+
+    data.sort((expenseA, expenseB) => {
+      if (
+        expenseA.categoryName.toLowerCase() >
+        expenseB.categoryName.toLowerCase()
+      ) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return data;
+  };
+
+  const sortByValue = (input) => {
+    let data = input;
+
+    data.sort((expenseA, expenseB) => {
+      return expenseA.value - expenseB.value;
+    });
+
+    return data;
+  };
+
+  const sortByPaymentMethod = (input) => {
+    let data = input;
+
+    data.sort((expenseA, expenseB) => {
+      return expenseA.paymentMethod - expenseB.paymentMethod;
+    });
+
+    return data;
+  };
+
+  const sortByNumberOfParcels = (input) => {
+    let data = input;
+
+    data.sort((expenseA, expenseB) => {
+      return expenseA.numberOfParcels - expenseB.numberOfParcels;
+    });
+
+    return data;
+  };
+
+  const sortByPaid = (input) => {
+    let data = input;
+
+    data.sort((expenseA, expenseB) => {
+      if (expenseA.isPaid && expenseB.isPaid) {
+        return 0;
+      } else if (expenseA.isPaid && !expenseB.isPaid) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
+
+    return data;
+  };
+
+  const sortByDueDate = (input) => {
+    let data = input;
+
+    data.sort((expenseA, expenseB) => {
+      return expenseA.dueDate - expenseB.dueDate;
+    });
+
+    return data;
+  };
+
   const filter = () => {
     let expensesAux = expenses;
 
@@ -141,7 +235,9 @@ const Expense = () => {
 
     if (dateFilter.length !== 0) {
       expensesAux = expensesAux.filter((expense) => {
-        return dateFilter === dates[expense.id];
+        return (
+          dateFilter === new Date(expense.dueDate * 1000).toLocaleDateString()
+        );
       });
     }
 
@@ -171,33 +267,7 @@ const Expense = () => {
 
   return (
     <div className="expense-screen">
-      <Menu direction="vertical" className="expense-menu">
-        <MenuItem
-          title="Cartão"
-          onClick={() => navigate("/card")}
-          icon={<FontAwesomeIcon icon={faCreditCard} />}
-        />
-        <MenuItem
-          title="Receita"
-          onClick={() => navigate("/income")}
-          icon={<FontAwesomeIcon icon={faMoneyBillTrendUp} />}
-        />
-        <MenuItem
-          title="Despesa"
-          onClick={() => navigate("/expense")}
-          icon={
-            <span className="icon-expense">
-              <FontAwesomeIcon icon={faMoneyBillTrendUp} />
-            </span>
-          }
-        />
-        <MenuItem
-          title="Ajuste"
-          onClick={() => navigate("/settings")}
-          icon={<FontAwesomeIcon icon={faGear} />}
-        />
-      </Menu>
-
+      <GlobalMenu direction="vertical" className="expense-menu" />
       <div className="main-content">
         <OptionsMenu
           filterOptions={
@@ -255,17 +325,38 @@ const Expense = () => {
           }
         />
         <Table title="Despesas">
-          <thead>
-            <tr>
-              <th>Descrição</th>
-              <th>Categoria</th>
-              <th>Valor (R$)</th>
-              <th>Método de pagamento</th>
-              <th>Número de parcelas</th>
-              <th>Está pago?</th>
-              <th>Data de vencimento</th>
-            </tr>
-          </thead>
+          <TableHeader
+            itens={[
+              {
+                label: "Descrição",
+                onClick: () => setSortBy("description"),
+              },
+              {
+                label: "Categoria",
+                onClick: () => setSortBy("category"),
+              },
+              {
+                label: "Valor (R$)",
+                onClick: () => setSortBy("value"),
+              },
+              {
+                label: "Método de pagamento",
+                onClick: () => setSortBy("payment-method"),
+              },
+              {
+                label: "Número de parcelas",
+                onClick: () => setSortBy("number-of-parcels"),
+              },
+              {
+                label: "Está pago?",
+                onClick: () => setSortBy("is-paid"),
+              },
+              {
+                label: "Data de vencimento",
+                onClick: () => setSortBy("due-date"),
+              },
+            ]}
+          />
           <tbody>{tableRows}</tbody>
         </Table>
       </div>

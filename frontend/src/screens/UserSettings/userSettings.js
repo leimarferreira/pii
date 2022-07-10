@@ -1,14 +1,11 @@
 import {
   faArrowRightFromBracket,
-  faCreditCard,
-  faGear,
-  faMoneyBillTrendUp,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FilePicker from "components/Form/Field/FilePicker/filePicker";
 import Form, { Submit, TextInput } from "components/Form/form";
-import Menu from "components/Menu/menu";
+import GlobalMenu from "components/GlobalMenu/globalMenu";
 import MenuItem from "components/Menu/MenuItem/menuItem";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -155,52 +152,34 @@ const UserSettings = () => {
 
   return (
     <div className="user-form-screen">
-      <Menu direction="vertical" className="user-menu">
-        <MenuItem
-          title="Cartão"
-          onClick={() => navigate("/card")}
-          icon={<FontAwesomeIcon icon={faCreditCard} />}
-        />
-        <MenuItem
-          title="Receita"
-          onClick={() => navigate("/income")}
-          icon={<FontAwesomeIcon icon={faMoneyBillTrendUp} />}
-        />
-        <MenuItem
-          title="Despesa"
-          onClick={() => navigate("/expense")}
-          icon={
-            <span className="icon-expense">
-              <FontAwesomeIcon icon={faMoneyBillTrendUp} />
-            </span>
-          }
-        />
-        <MenuItem
-          title="Ajuste"
-          onClick={() => navigate("/settings")}
-          icon={<FontAwesomeIcon icon={faGear} />}
-        />
-        <MenuItem
-          className="important-action"
-          title="Apagar conta"
-          onClick={() => deleteAccount()}
-          icon={
-            <span className="important-icon">
-              <FontAwesomeIcon icon={faTrashCan} />
-            </span>
-          }
-        />
-        <MenuItem
-          className="important-action"
-          title="Sair da conta"
-          onClick={() => logout()}
-          icon={
-            <span className="important-icon">
-              <FontAwesomeIcon icon={faArrowRightFromBracket} />
-            </span>
-          }
-        />
-      </Menu>
+      <GlobalMenu
+        direction="vertical"
+        className="user-menu"
+        appendItems={
+          <>
+            <MenuItem
+              className="important-action"
+              title="Apagar conta"
+              onClick={() => deleteAccount()}
+              icon={
+                <span className="important-icon">
+                  <FontAwesomeIcon icon={faTrashCan} />
+                </span>
+              }
+            />
+            <MenuItem
+              className="important-action"
+              title="Sair da conta"
+              onClick={() => logout()}
+              icon={
+                <span className="important-icon">
+                  <FontAwesomeIcon icon={faArrowRightFromBracket} />
+                </span>
+              }
+            />
+          </>
+        }
+      />
       <div className="user-form-container">
         <Form
           className="user-form"
