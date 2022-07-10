@@ -259,8 +259,10 @@ const ExpenseForm = () => {
       if (response.status === 200 || response.status === 201) {
         navigate("/expense");
       }
-    } catch {
-      setErrorMessage("Erro ao salvar despesa.");
+    } catch (error) {
+      setErrorMessage(
+        error?.response?.data?.message ?? "Erro ao salvar despesa."
+      );
       setError(true);
     }
   };

@@ -27,10 +27,13 @@ const Home = () => {
     if (userFinancialData) {
       let tableRowsAux = (
         <tr>
-          <td>{userFinancialData.totalIncomes}</td>
+          <td>{userFinancialData.totalIncomes.toFixed(2)}</td>
+          <td>{userFinancialData.creditExpenses.toFixed(2)}</td>
+          <td>{userFinancialData.debitExpenses.toFixed(2)}</td>
+          <td>{userFinancialData.moneyExpenses.toFixed(2)}</td>
           <td>{userFinancialData.totalExpenses}</td>
-          <td>{userFinancialData.totalCards}</td>
-          <td>{userFinancialData.balance}</td>
+          <td>{userFinancialData.totalCredit.toFixed(2)}</td>
+          <td>{userFinancialData.balance.toFixed(2)}</td>
         </tr>
       );
 
@@ -65,9 +68,12 @@ const Home = () => {
         <thead>
           <tr>
             <th>Total de receitas (R$)</th>
+            <th>Despesas - crédito (R$)</th>
+            <th>Despesas - débito (R$)</th>
+            <th>Despesas - dinheiro (R$)</th>
             <th>Total de despesas (R$)</th>
-            <th>Total de cartões (crédito + débito)</th>
-            <th>Saldo</th>
+            <th>Crédito total (R$)</th>
+            <th>Saldo (R$)</th>
           </tr>
         </thead>
         <tbody>{tableRows}</tbody>

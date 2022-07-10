@@ -47,6 +47,8 @@ const Card = () => {
       const response = await request.get(`/card/user/${user.id}`);
       if (response.status === 200) {
         setCards(response.data);
+      } else if (response.status === 204) {
+        setCards([]);
       }
     } catch (error) {}
   };
@@ -73,7 +75,7 @@ const Card = () => {
           <td>
             {card.type === 1
               ? card.limit.toFixed(2)
-              : userFinancialData.totalIncomes.toFixed(2)}
+              : userFinancialData.totalIncomes?.toFixed(2)}
           </td>
           <td>{card.type === 1 ? card.currentValue.toFixed(2) : "-"}</td>
           <td>{card.type === 1 ? card.dueDate : "-"}</td>
@@ -239,6 +241,7 @@ const Card = () => {
       try {
         await request.delete(`/card/${selected.id}`);
         await getCards();
+        setSelected({});
       } catch {}
     }
   };

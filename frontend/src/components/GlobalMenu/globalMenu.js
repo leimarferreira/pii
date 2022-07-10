@@ -13,8 +13,6 @@ const GlobalMenu = ({ direction, className, appendItems }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  console.log(location);
-
   return (
     <>
       <Menu className={className} direction={direction}>

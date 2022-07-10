@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import pii.dto.UserFinancialData;
-import pii.enums.CardType;
+import pii.enums.PaymentMethod;
 import pii.repository.ExpenseRepository;
 
 @Service
@@ -23,15 +23,26 @@ public class UserFinancialDataService {
 	public Optional<UserFinancialData> getUserFinancialData(long userId) {
 		try {
 			var totalIncomes = getTotalIncomes(userId);
+			var debitExpenses = getDebitExpenses(userId);
+			var creditExpenses = getCreditExpenses(userId);
+			var moneyExpenses = getMoneyExpenses(userId);
+			var totalCredit = getTotalCredit(userId);
 			var totalExpenses = getTotalExpenses(userId);
-			var totalCards = getTotalCards(userId);
 			
 			var balance = new BigDecimal(0);
-			balance = balance.add(totalCards);
 			balance = balance.add(totalIncomes);
-			balance = balance.subtract(totalExpenses);
+			balance = balance.subtract(debitExpenses);
+			balance = balance.add(totalCredit);
 			
-			var data = new UserFinancialData(userId, totalExpenses, totalIncomes, totalCards, balance);
+			var data = new UserFinancialData(
+					userId,
+					creditExpenses,
+					debitExpenses,
+					moneyExpenses,
+					totalExpenses,
+					totalIncomes,
+					totalCredit,
+					balance);
 			return Optional.of(data);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -48,6 +59,45 @@ public class UserFinancialDataService {
 
 		return total;
 	}
+	
+	private BigDecimal getDebitExpenses(long userId) {
+		var total = new BigDecimal(0);
+		var expenses = expenseRepository.findAllByUserId(userId)
+				.stream()
+				.filter(expense -> expense.paymentMethod() == PaymentMethod.DEBIT)
+				.toList();
+		for (var expense : expenses) {
+			total = total.add(expense.value());
+		}
+		
+		return total;
+	}
+	
+	private BigDecimal getCreditExpenses(long userId) {
+		var total = new BigDecimal(0);
+		var expenses = expenseRepository.findAllByUserId(userId)
+				.stream()
+				.filter(expense -> expense.paymentMethod() == PaymentMethod.CREDIT)
+				.toList();
+		for (var expense : expenses) {
+			total = total.add(expense.value());
+		}
+		
+		return total;
+	}
+	
+	private BigDecimal getMoneyExpenses(long userId) {
+		var total = new BigDecimal(0);
+		var expenses = expenseRepository.findAllByUserId(userId)
+				.stream()
+				.filter(expense -> expense.paymentMethod() == PaymentMethod.MONEY)
+				.toList();
+		for (var expense : expenses) {
+			total = total.add(expense.value());
+		}
+		
+		return total;
+	}
 
 	private BigDecimal getTotalExpenses(long userId) {
 		BigDecimal total = new BigDecimal(0);
@@ -60,15 +110,14 @@ public class UserFinancialDataService {
 		return total;
 	}
 	
-	private BigDecimal getTotalCards(long userId) {
-		BigDecimal total = new BigDecimal(0);
-		var cards = cardService.findAllByUserId(userId);
-		for (var card : cards ) {
-			if (card.type() == CardType.CREDIT.getValue()) {
-				total = total.add(card.limit());
-			} else if (card.type() == CardType.DEBIT.getValue()) {
-				total = total.add(card.currentValue());
-			}
+	private BigDecimal getTotalCredit(long userId) {
+		var total = new BigDecimal(0);
+		var cards = cardService.findAllByUserId(userId)
+				.stream()
+				.filter(card -> card.type() == 1)
+				.toList();
+		for (var card : cards) {
+			total = total.add(card.limit().subtract(card.currentValue()));
 		}
 		
 		return total;

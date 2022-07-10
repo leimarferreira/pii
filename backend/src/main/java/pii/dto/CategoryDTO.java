@@ -1,7 +1,7 @@
 package pii.dto;
 
-import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
