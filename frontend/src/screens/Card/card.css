@@ -42,3 +42,7 @@
 .card-opt-menu {
   height: fit-content;
 }
+
+.error-message {
+  color: #ff0000;
+}
