@@ -22,10 +22,13 @@ const Category = () => {
   const [tableRows, setTableRows] = useState([]);
 
   const [categoryName, setCategoryName] = useState("");
-  const [hasError, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [isAddModalVisible, setAddModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(true);
+
+  const [hasError, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [hasModalError, setModalError] = useState(false);
+  const [modalErrorMessage, setModalErrorMessage] = useState("");
 
   const [sortBy, setSortBy] = useState("none");
 
@@ -76,7 +79,12 @@ const Category = () => {
       try {
         await request.delete(`/category/${selected.id}`);
         await getCategories();
-      } catch {}
+      } catch {
+        setErrorMessage(
+          "Categoria não pode ser deletada, pois já está sendo utilizada."
+        );
+        setError(true);
+      }
     }
   };
 
@@ -128,11 +136,11 @@ const Category = () => {
 
       setAddModalVisible(false);
       setCategoryName("");
-      setError(false);
+      setModalError(false);
       await getCategories();
     } catch (error) {
-      setErrorMessage("Ocorreu um erro ao salvar a categoria.");
-      setError(true);
+      setModalErrorMessage("Ocorreu um erro ao salvar a categoria.");
+      setModalError(true);
     }
   };
 
@@ -153,7 +161,7 @@ const Category = () => {
     setCategoryName("");
     setAddModalVisible(false);
     setEditMode(false);
-    setError(false);
+    setModalError(false);
   };
 
   return (
@@ -198,6 +206,7 @@ const Category = () => {
           />
           <tbody>{tableRows}</tbody>
         </Table>
+        {hasError && <span className="error-message">{errorMessage}</span>}
         <Modal
           cancelAction={cancelCategoryAdd}
           confirmAction={submitData}
@@ -210,7 +219,9 @@ const Category = () => {
             onChange={setCategoryName}
             value={categoryName}
           />
-          {hasError && <span className="error-message">{errorMessage}</span>}
+          {hasModalError && (
+            <span className="error-message">{modalErrorMessage}</span>
+          )}
         </Modal>
       </div>
     </div>

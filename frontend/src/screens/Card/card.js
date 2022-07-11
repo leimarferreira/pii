@@ -28,6 +28,9 @@ const Card = () => {
 
   const [sortBy, setSortBy] = useState("none");
 
+  const [errorMessage, setErrorMessage] = useState("");
+  const [hasError, setError] = useState(false);
+
   const navigate = useNavigate();
 
   const cardTypes = {
@@ -242,7 +245,12 @@ const Card = () => {
         await request.delete(`/card/${selected.id}`);
         await getCards();
         setSelected({});
-      } catch {}
+      } catch {
+        setErrorMessage(
+          "Cartão não pode ser deletado por ser utilizado em várias despesas."
+        );
+        setError(true);
+      }
     }
   };
 
@@ -356,6 +364,7 @@ const Card = () => {
           />
           <tbody>{tableRows}</tbody>
         </Table>
+        {hasError && <span className="error-message">{errorMessage}</span>}
       </div>
     </div>
   );

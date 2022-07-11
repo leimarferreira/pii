@@ -127,7 +127,7 @@ public class DataLoader {
 					category_id BIGINT NOT NULL,
 					PRIMARY KEY (id),
 					FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-					FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE
+					FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE NO ACTION
 				)
 				""";
 		
@@ -153,7 +153,8 @@ public class DataLoader {
 					due_date BIGINT,
 					PRIMARY KEY (id),
 					FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-					FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE
+					FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE NO ACTION,
+					FOREIGN KEY (card_id) REFERENCES card (id) ON DELETE NO ACTION
 				)
 				""";
 		
